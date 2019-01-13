@@ -1,0 +1,31 @@
+{
+  "name": "node-fetch-cookies",
+  "version": "1.0.0",
+  "description": "node-fetch wrapper that adds support for cookie-jars",
+  "main": "src/index.mjs",
+  "engines": {
+      "node": ">=10.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jkhsjdhjs/node-fetch-cookies.git"
+  },
+  "keywords": [
+    "cookie",
+    "cookie-jar",
+    "node-fetch",
+    "fetch"
+  ],
+  "author": "jkhsjdhjs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jkhsjdhjs/node-fetch-cookies/issues"
+  },
+  "homepage": "https://github.com/jkhsjdhjs/node-fetch-cookies#readme",
+  "dependencies": {
+    "node-fetch": "^2.3.0"
+  }
+}
