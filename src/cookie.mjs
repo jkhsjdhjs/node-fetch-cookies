@@ -1,12 +1,16 @@
 import urlParser from "url";
 
 const validateHostname = (cookieHostname, requestHostname, subdomains) => {
+    cookieHostname = cookieHostname.toLowerCase();
+    requestHostname = requestHostname.toLowerCase();
     if(requestHostname === cookieHostname || (subdomains && requestHostname.endsWith("." + cookieHostname)))
         return true;
     return false;
 };
 
 const validatePath = (cookiePath, requestPath) => {
+    cookiePath = cookiePath.toLowerCase();
+    requestPath = requestPath.toLowerCase();
     if(cookiePath.endsWith("/"))
         cookiePath = cookiePath.slice(0, -1);
     if(requestPath.endsWith("/"))
@@ -32,14 +36,14 @@ export default class Cookie {
                 if(k === "expires") {
                     if(this.expiry) // max-age has precedence over expires
                         continue;
-                    if(!/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2} (?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) \d{4} \d{2}:\d{2}:\d{2} GMT$/.test(v)
+                    if(!/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2}[ -](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ -]\d{2,4} \d{2}:\d{2}:\d{2} GMT$/.test(v)
                         || (this.expiry = new Date(v)) === "Invalid Date")
                         throw new TypeError("Invalid value for Expires \"" + v + "\"!");
                 }
                 else if(k === "max-age") {
                     const seconds = parseInt(v);
                     if(seconds.toString() !== v)
-                        throw new TypeError("Invalid value for Max-Age \"" + v + "\"!")
+                        throw new TypeError("Invalid value for Max-Age \"" + v + "\"!");
                     this.expiry = new Date();
                     this.expiry.setSeconds(this.expiry.getSeconds() + seconds);
                 }
@@ -78,13 +82,16 @@ export default class Cookie {
             throw new TypeError("Cookie has \"__Host-\" prefix but \"Secure\" isn't set, the cookie is not set via https, \"Domain\" is set or \"Path\" is not equal to \"/\"!");
     }
     static fromObject(obj) {
-        return Object.assign(Object.create(this.prototype), obj);
+        let c = Object.assign(Object.create(this.prototype), obj);
+        if(c.expiry && typeof c.expiry === "string")
+            c.expiry = new Date(c.expiry);
+        return c;
     }
     serialize() {
         return this.name + "=" + this.value;
     }
     isValidForRequest(url) {
-        if(this.expiry && this.expiry > new Date())
+        if(this.expiry && this.expiry < new Date())
             return false;
         const parsedURL = urlParser.parse(url);
         if(parsedURL.protocol !== "http:" && parsedURL.protocol !== "https:")

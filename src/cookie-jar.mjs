@@ -18,14 +18,14 @@ export default class CookieJar {
         }
         else if(cookies instanceof Cookie)
             this.cookies.set(cookies.name, cookies);
-        else
+        else if(cookies)
             throw new TypeError("Third parameter is neither an array nor a cookie!");
         if(this.cookies.size === 0 && this.file.length !== 0 && fs.existsSync(this.file))
-            this.cookies = new Map(JSON.parse(fs.readFileSync(this.file)));
+            this.cookies = new Map(JSON.parse(fs.readFileSync(this.file)).map(([k, v]) => [k, Cookie.fromObject(v)]));
     }
-    addCookie(c) {
+    addCookie(c, fromURL) {
         if(typeof c === "string")
-            c = new Cookie(c);
+            c = new Cookie(c, fromURL);
         this.cookies.set(c.name, c);
     }
     forEach(callback) {
