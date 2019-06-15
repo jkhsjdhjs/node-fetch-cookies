@@ -90,8 +90,11 @@ export default class Cookie {
     serialize() {
         return this.name + "=" + this.value;
     }
+    hasExpired() {
+        return this.expiry && this.expiry < new Date();
+    }
     isValidForRequest(url) {
-        if(this.expiry && this.expiry < new Date())
+        if(this.hasExpired())
             return false;
         const parsedURL = urlParser.parse(url);
         if(parsedURL.protocol !== "http:" && parsedURL.protocol !== "https:")

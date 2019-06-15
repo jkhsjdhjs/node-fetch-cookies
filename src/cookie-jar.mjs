@@ -35,7 +35,7 @@ export default class CookieJar {
         // only save cookies that haven't expired
         let cookiesToSave = new Map();
         this.forEach(cookie => {
-            if(cookie.expiry && cookie.expiry > new Date())
+            if(!cookie.hasExpired())
                 cookiesToSave.set(cookie.name, cookie);
         });
         fs.writeFileSync(this.file, JSON.stringify([...cookiesToSave]));

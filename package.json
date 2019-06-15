@@ -1,10 +1,10 @@
 {
   "name": "node-fetch-cookies",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "node-fetch wrapper that adds support for cookie-jars",
   "main": "src/index.mjs",
   "engines": {
-      "node": ">=10.0.0"
+    "node": ">=10.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -26,6 +26,6 @@
   },
   "homepage": "https://github.com/jkhsjdhjs/node-fetch-cookies#readme",
   "dependencies": {
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.6.0"
   }
 }
