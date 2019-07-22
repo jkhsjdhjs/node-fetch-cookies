@@ -1,6 +1,6 @@
 {
   "name": "node-fetch-cookies",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "node-fetch wrapper that adds support for cookie-jars",
   "main": "src/index.mjs",
   "engines": {
