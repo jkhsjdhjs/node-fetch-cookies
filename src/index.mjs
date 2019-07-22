@@ -4,24 +4,26 @@ import Cookie from "./cookie";
 
 async function cookieFetch(cookieJars, url, options) {
     let cookies = "";
-    if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar)) {
-        cookieJars.forEach(jar => {
-            if(!jar.flags.includes("r"))
-                return;
-            jar.forEach(c => {
+    if(cookieJars) {
+        if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar)) {
+            cookieJars.forEach(jar => {
+                if(!jar.flags.includes("r"))
+                    return;
+                jar.forEach(c => {
+                    if(c.isValidForRequest(url))
+                        cookies += c.serialize() + "; ";
+                });
+            });
+        }
+        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r")) {
+            cookieJars.forEach(c => {
                 if(c.isValidForRequest(url))
                     cookies += c.serialize() + "; ";
             });
-        });
+        }
+        else
+            throw new TypeError("First paramter is neither a cookie jar nor an array of cookie jars!");
     }
-    else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r")) {
-        cookieJars.forEach(c => {
-            if(c.isValidForRequest(url))
-                cookies += c.serialize() + "; ";
-        });
-    }
-    else
-        throw new TypeError("Third paramter is neither a cookie jar nor an array of cookie jars!");
     if(cookies.length !== 0) {
         if(!options) {
             options = {
@@ -35,7 +37,7 @@ async function cookieFetch(cookieJars, url, options) {
     const result = await fetch(url, options);
     // i cannot use headers.get() here because it joins the cookies to a string
     cookies = result.headers[Object.getOwnPropertySymbols(result.headers)[0]]["set-cookie"];
-    if(cookies) {
+    if(cookies && cookieJars) {
         if(Array.isArray(cookieJars)) {
             cookieJars.forEach(jar => {
                 if(!jar.flags.includes("w"))
