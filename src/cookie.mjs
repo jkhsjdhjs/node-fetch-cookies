@@ -27,7 +27,6 @@ export default class Cookie {
         [this.name, this.value] = splitted[0].split("=");
         if(this.value.startsWith("\"") && this.value.endsWith("\""))
             this.value = this.value.slice(1, -1);
-        this.value = this.value;
 
         for(let i = 1; i < splitted.length; i++) {
             let [k, v] = splitted[i].split("=");
