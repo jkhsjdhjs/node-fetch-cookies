@@ -1,26 +1,32 @@
 import fetch from "node-fetch";
 import CookieJar from "./cookie-jar";
 import Cookie from "./cookie";
+import urlParser from "url";
 
 async function cookieFetch(cookieJars, url, options) {
     let cookies = "";
+    const domains =
+        urlParser
+        .parse(url)
+        .hostname
+        .split(".")
+        .map((_, i, a) => a.slice(i).join("."))
+        .slice(0, -1);
+    const addValidFromJar = jar =>
+        domains
+            .map(d => [...jar.iterValidForRequest(d, url)])
+            .reduce((a, b) => [...a, ...b])
+            .forEach(c => cookies += c.serialize() + "; ");
     if(cookieJars) {
         if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar)) {
             cookieJars.forEach(jar => {
                 if(!jar.flags.includes("r"))
                     return;
-                jar.forEach(c => {
-                    if(c.isValidForRequest(url))
-                        cookies += c.serialize() + "; ";
-                });
+                addValidFromJar(jar);
             });
         }
-        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r")) {
-            cookieJars.forEach(c => {
-                if(c.isValidForRequest(url))
-                    cookies += c.serialize() + "; ";
-            });
-        }
+        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r"))
+            addValidFromJar(cookieJars);
         else
             throw new TypeError("First paramter is neither a cookie jar nor an array of cookie jars!");
     }

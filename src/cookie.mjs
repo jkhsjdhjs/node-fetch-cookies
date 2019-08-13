@@ -18,18 +18,27 @@ const validatePath = (cookiePath, requestPath) => {
     return (requestPath + "/").startsWith(cookiePath + "/");
 };
 
+const splitN = (str, sep, n) => {
+    const splitted = str.split(sep);
+    if(n < splitted.length - 1) {
+        splitted[n] = splitted.slice(n).join(sep);
+        splitted.splice(n + 1);
+    }
+    return splitted;
+};
+
 export default class Cookie {
     constructor(str, url) {
         if(typeof str !== "string")
             throw new TypeError("Input not a string");
 
         const splitted = str.split("; ");
-        [this.name, this.value] = splitted[0].split("=");
+        [this.name, this.value] = splitN(splitted[0], "=", 1);
         if(this.value.startsWith("\"") && this.value.endsWith("\""))
             this.value = this.value.slice(1, -1);
 
         for(let i = 1; i < splitted.length; i++) {
-            let [k, v] = splitted[i].split("=");
+            let [k, v] = splitN(splitted[i], "=", 1);
             k = k.toLowerCase();
             if(v) {
                 if(k === "expires") {
@@ -40,7 +49,7 @@ export default class Cookie {
                         throw new TypeError("Invalid value for Expires \"" + v + "\"!");
                 }
                 else if(k === "max-age") {
-                    const seconds = parseInt(v);
+                    const seconds = ~~+v;
                     if(seconds.toString() !== v)
                         throw new TypeError("Invalid value for Max-Age \"" + v + "\"!");
                     this.expiry = new Date();

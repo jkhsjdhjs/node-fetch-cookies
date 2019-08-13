@@ -43,11 +43,29 @@ A class that stores cookies.
 
 #### addCookie(cookie[, url])
 Adds a cookie to the jar.
-- `cookie` A [Cookie](#class-cookie) instance to add to the cookie jar. Alternatively this can also be a string, for example the string received from a website. In this case `url` should be specified.
+- `cookie` A [Cookie](#class-cookie) instance to add to the cookie jar. Alternatively this can also be a string, for example a serialized cookie received from a website. In this case `url` should be specified.
 - `url` The url a cookie has been received from.
 
-#### forEach(callback)
-Just a wrapper for `CookieJar.cookies.forEach(callback)`.
+#### addFromFile(file)
+Reads a cookie jar from the disk and adds the contained cookies.
+
+#### domains()
+Returns an array of the domains currently stored cookies for.
+
+#### *iterValidForRequest(domain, url)
+Returns an iterator over all cookies valid for a request to `domain` and `url`.
+
+#### *iterValid()
+Returns an iterator over all valid (non-expired) cookies.
+
+#### *iterAll()
+Returns an iterator over all cookies currently stored.
+
+#### *iter(domain)
+Returns an iterator over all cookies for a specific domain.
+
+#### deleteExpired()
+Removes all expired cookies from the jar.
 
 #### save()
 Saves the cookie jar to disk. Only non-expired cookies are saved.
