@@ -16,6 +16,7 @@ async function cookieFetch(cookieJars, url, options) {
         domains
             .map(d => [...jar.iterValidForRequest(d, url)])
             .reduce((a, b) => [...a, ...b])
+            .filter((v, i, a) => a.slice(0, i).every(c => c.name !== v.name)) //unique
             .forEach(c => cookies += c.serialize() + "; ");
     if(cookieJars) {
         if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar)) {
