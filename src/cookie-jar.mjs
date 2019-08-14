@@ -1,4 +1,5 @@
 import fs from "fs";
+import url from "url";
 import Cookie from "./cookie";
 
 export default class CookieJar {
@@ -28,7 +29,7 @@ export default class CookieJar {
     addCookie(c, fromURL) {
         if(typeof c === "string")
             c = new Cookie(c, fromURL);
-        if(!(c instanceof Cookie))
+        else if(!(c instanceof Cookie))
             throw new TypeError("First parameter is neither a string nor a cookie!");
         if(!this.cookies.get(c.domain))
             this.cookies.set(c.domain, new Map());
@@ -38,35 +39,48 @@ export default class CookieJar {
         JSON.parse(fs.readFileSync(this.file)).forEach(c => this.addCookie(Cookie.fromObject(c)));
     }
     domains() {
-        return [...this.cookies.keys()];
+        return this.cookies.keys();
     }
-    *iterValidForRequest(domain, url) {
-        for(const cookie of this.iter(domain))
-            if(cookie.isValidForRequest(url))
-                yield cookie;
-    }
-    *iterValid() {
-        for(const cookie of this.iterAll())
-            if(!cookie.hasExpired())
-                yield cookie;
-    }
-    *iterAll() {
-        for(const domain of this.domains())
-            yield* this.iter(domain);
-    }
-    *iter(domain) {
+    *cookiesDomain(domain) {
         for(const cookie of (this.cookies.get(domain) || []).values())
             yield cookie;
     }
+    *cookiesValid() {
+        for(const cookie of this.cookiesAll())
+            if(!cookie.hasExpired())
+                yield cookie;
+    }
+    *cookiesAll() {
+        for(const domain of this.domains())
+            yield* this.cookiesDomain(domain);
+    }
+    *cookiesValidForRequest(requestURL) {
+        const namesYielded = [],
+              domains = url
+                .parse(requestURL)
+                .hostname
+                .split(".")
+                .map((_, i, a) => a.slice(i).join("."))
+                .slice(0, -1);
+        for(const domain of domains) {
+            for(const cookie of this.cookiesDomain(domain)) {
+                if(cookie.isValidForRequest(requestURL)
+                && namesYielded.every(name => name !== cookie.name)) {
+                    namesYielded.push(cookie.name);
+                    yield cookie;
+                }
+            }
+        }
+    }
     deleteExpired() {
-        const filteredCookies = [...this.iterValid()];
+        const validCookies = [...this.cookiesValid()];
         this.cookies = new Map();
-        filteredCookies.forEach(c => this.addCookie(c));
+        validCookies.forEach(c => this.addCookie(c));
     }
     save() {
         if(typeof this.file !== "string")
             throw new Error("No file has been specified for this cookie jar!");
         // only save cookies that haven't expired
-        fs.writeFileSync(this.file, JSON.stringify([...this.iterValid()]));
+        fs.writeFileSync(this.file, JSON.stringify([...this.cookiesValid()]));
     }
 };

@@ -50,19 +50,19 @@ Adds a cookie to the jar.
 Reads a cookie jar from the disk and adds the contained cookies.
 
 #### domains()
-Returns an array of the domains currently stored cookies for.
+Returns an iterator over all domains currently stored cookies for.
 
-#### *iterValidForRequest(domain, url)
-Returns an iterator over all cookies valid for a request to `domain` and `url`.
+#### *cookiesDomain(domain)
+Returns an iterator over all cookies currently stored for `domain`.
 
-#### *iterValid()
+#### *cookiesValid()
 Returns an iterator over all valid (non-expired) cookies.
 
-#### *iterAll()
+#### *cookiesAll()
 Returns an iterator over all cookies currently stored.
 
-#### *iter(domain)
-Returns an iterator over all cookies for a specific domain.
+#### *cookiesValidForRequest(url)
+Returns an iterator over all cookies valid for a request to `url`.
 
 #### deleteExpired()
 Removes all expired cookies from the jar.

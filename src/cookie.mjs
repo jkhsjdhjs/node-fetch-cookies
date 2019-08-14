@@ -1,4 +1,4 @@
-import urlParser from "url";
+import url from "url";
 
 const validateHostname = (cookieHostname, requestHostname, subdomains) => {
     cookieHostname = cookieHostname.toLowerCase();
@@ -28,12 +28,14 @@ const splitN = (str, sep, n) => {
 };
 
 export default class Cookie {
-    constructor(str, url) {
+    constructor(str, requestURL) {
         if(typeof str !== "string")
-            throw new TypeError("Input not a string");
+            throw new TypeError("First parameter is not a string!");
 
         const splitted = str.split("; ");
         [this.name, this.value] = splitN(splitted[0], "=", 1);
+        if(!this.name)
+            throw new Error("Invalid cookie name \"" + this.name + "\"");
         if(this.value.startsWith("\"") && this.value.endsWith("\""))
             this.value = this.value.slice(1, -1);
 
@@ -46,12 +48,12 @@ export default class Cookie {
                         continue;
                     if(!/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2}[ -](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ -]\d{2,4} \d{2}:\d{2}:\d{2} GMT$/.test(v)
                         || (this.expiry = new Date(v)) === "Invalid Date")
-                        throw new TypeError("Invalid value for Expires \"" + v + "\"!");
+                        throw new Error("Invalid value for Expires \"" + v + "\"!");
                 }
                 else if(k === "max-age") {
                     const seconds = ~~+v;
                     if(seconds.toString() !== v)
-                        throw new TypeError("Invalid value for Max-Age \"" + v + "\"!");
+                        throw new Error("Invalid value for Max-Age \"" + v + "\"!");
                     this.expiry = new Date();
                     this.expiry.setSeconds(this.expiry.getSeconds() + seconds);
                 }
@@ -67,7 +69,7 @@ export default class Cookie {
                 else if(k === "samesite") // only relevant for cross site requests, so not for us
                     continue;
                 else
-                    throw new TypeError("Invalid key \"" + k + "\" specified!");
+                    throw new Error("Invalid key \"" + k + "\" with value \"" + v + "\" specified!");
             }
             else {
                 if(k === "secure")
@@ -75,23 +77,32 @@ export default class Cookie {
                 else if(k === "httponly") // only relevant for browsers
                     continue;
                 else
-                    throw new TypeError("Invalid key \"" + k + "\" specified!");
+                    throw new Error("Invalid key \"" + k + "\" without value specified!");
             }
         }
+
+        const parsedURL = url.parse(requestURL);
+
+        if(this.name.toLowerCase().startsWith("__secure-") && (!this.secure || parsedURL.protocol !== "https:"))
+            throw new Error("Cookie has \"__Secure-\" prefix but \"Secure\" isn't set or the cookie is not set via https!");
+        if(this.name.toLowerCase().startsWith("__host-") && (!this.secure || parsedURL.protocol !== "https:" || this.domain))
+            throw new Error("Cookie has \"__Host-\" prefix but \"Secure\" isn't set, the cookie is not set via https, \"Domain\" is set or \"Path\" is not equal to \"/\"!");
+
+        // assign defaults
         if(!this.domain) {
-            this.domain = urlParser.parse(url).hostname;
+            this.domain = parsedURL.hostname;
             this.subdomains = false;
         }
         if(!this.path)
             this.path = "/";
-        if(this.name.toLowerCase().startsWith("__secure-") && (!this.secure || !url.toLowerCase().startsWith("https:")))
-            throw new TypeError("Cookie has \"__Secure-\" prefix but \"Secure\" isn't set or the cookie is not set via https!");
-        if(this.name.toLowerCase().startsWith("__host-") && (!this.secure || !url.toLowerCase().startsWith("https:") || this.domain || this.path !== "/"))
-            throw new TypeError("Cookie has \"__Host-\" prefix but \"Secure\" isn't set, the cookie is not set via https, \"Domain\" is set or \"Path\" is not equal to \"/\"!");
+        if(!this.secure)
+            this.secure = false;
+        if(!this.expiry)
+            this.expiry = null;
     }
     static fromObject(obj) {
         let c = Object.assign(Object.create(this.prototype), obj);
-        if(c.expiry && typeof c.expiry === "string")
+        if(typeof c.expiry === "string")
             c.expiry = new Date(c.expiry);
         return c;
     }
@@ -101,17 +112,14 @@ export default class Cookie {
     hasExpired() {
         return this.expiry && this.expiry < new Date();
     }
-    isValidForRequest(url) {
+    isValidForRequest(requestURL) {
         if(this.hasExpired())
             return false;
-        const parsedURL = urlParser.parse(url);
-        if(parsedURL.protocol !== "http:" && parsedURL.protocol !== "https:")
-            return false;
-        if(this.secure && parsedURL.protocol !== "https:")
-            return false;
-        if(!validateHostname(this.domain, parsedURL.hostname, this.subdomains))
-            return false;
-        if(!validatePath(this.path, parsedURL.pathname))
+        const parsedURL = url.parse(requestURL);
+        if(parsedURL.protocol !== "http:" && parsedURL.protocol !== "https:"
+        || this.secure && parsedURL.protocol !== "https:"
+        || !validateHostname(this.domain, parsedURL.hostname, this.subdomains)
+        || !validatePath(this.path, parsedURL.pathname))
             return false;
         return true;
     }

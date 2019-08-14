@@ -1,43 +1,27 @@
 import fetch from "node-fetch";
 import CookieJar from "./cookie-jar";
 import Cookie from "./cookie";
-import urlParser from "url";
 
 async function cookieFetch(cookieJars, url, options) {
     let cookies = "";
-    const domains =
-        urlParser
-        .parse(url)
-        .hostname
-        .split(".")
-        .map((_, i, a) => a.slice(i).join("."))
-        .slice(0, -1);
-    const addValidFromJar = jar =>
-        domains
-            .map(d => [...jar.iterValidForRequest(d, url)])
+    const addValidFromJars = jars =>
+        jars
+            .map(jar => [...jar.cookiesValidForRequest(url)])
             .reduce((a, b) => [...a, ...b])
-            .filter((v, i, a) => a.slice(0, i).every(c => c.name !== v.name)) //unique
+            .filter((v, i, a) => a.slice(0, i).every(c => c.name !== v.name)) // filter cookies with duplicate names
             .forEach(c => cookies += c.serialize() + "; ");
     if(cookieJars) {
-        if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar)) {
-            cookieJars.forEach(jar => {
-                if(!jar.flags.includes("r"))
-                    return;
-                addValidFromJar(jar);
-            });
-        }
+        if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar))
+            addValidFromJars(cookieJars.filter(jar => jar.flags.includes("r")));
         else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r"))
-            addValidFromJar(cookieJars);
+            addValidFromJars([cookieJars]);
         else
             throw new TypeError("First paramter is neither a cookie jar nor an array of cookie jars!");
     }
-    if(cookies.length !== 0) {
-        if(!options) {
-            options = {
-                headers: {}
-            };
-        }
-        else if(!options.headers)
+    if(cookies) {
+        if(!options)
+            options = {};
+        if(!options.headers)
             options.headers = {};
         options.headers.cookie = cookies.slice(0, -2);
     }
@@ -46,13 +30,11 @@ async function cookieFetch(cookieJars, url, options) {
     cookies = result.headers[Object.getOwnPropertySymbols(result.headers)[0]]["set-cookie"];
     if(cookies && cookieJars) {
         if(Array.isArray(cookieJars)) {
-            cookieJars.forEach(jar => {
-                if(!jar.flags.includes("w"))
-                    return;
-                cookies.forEach(c => jar.addCookie(c, url));
-            });
+            cookieJars
+                .filter(jar => jar.flags.includes("w"))
+                .forEach(jar => cookies.forEach(c => jar.addCookie(c, url)));
         }
-        else if(cookieJars.flags.includes("w")) {
+        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("w")) {
             cookies.forEach(c => cookieJars.addCookie(c, url));
         }
     }
