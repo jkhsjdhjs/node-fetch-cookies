@@ -109,11 +109,11 @@ export default class Cookie {
     serialize() {
         return this.name + "=" + this.value;
     }
-    hasExpired() {
-        return this.expiry && this.expiry < new Date();
+    hasExpired(sessionEnded) {
+        return sessionEnded && this.expiry === null || this.expiry < new Date();
     }
     isValidForRequest(requestURL) {
-        if(this.hasExpired())
+        if(this.hasExpired(false))
             return false;
         const parsedURL = url.parse(requestURL);
         if(parsedURL.protocol !== "http:" && parsedURL.protocol !== "https:"

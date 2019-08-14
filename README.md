@@ -55,8 +55,8 @@ Returns an iterator over all domains currently stored cookies for.
 #### *cookiesDomain(domain)
 Returns an iterator over all cookies currently stored for `domain`.
 
-#### *cookiesValid()
-Returns an iterator over all valid (non-expired) cookies.
+#### *cookiesValid(withSession)
+Returns an iterator over all valid (non-expired) cookies. Includes session cookies if `withSession` is `true`.
 
 #### *cookiesAll()
 Returns an iterator over all cookies currently stored.
@@ -65,10 +65,10 @@ Returns an iterator over all cookies currently stored.
 Returns an iterator over all cookies valid for a request to `url`.
 
 #### deleteExpired()
-Removes all expired cookies from the jar.
+Removes all expired cookies from the jar (including session cookies).
 
 #### save()
-Saves the cookie jar to disk. Only non-expired cookies are saved.
+Saves the cookie jar to disk. Only non-expired non-session cookies are saved.
 
 
 ### Class: Cookie
@@ -77,11 +77,11 @@ An abstract representation of a cookie.
 #### Properties
 - `name` The identifier of the cookie.
 - `value` The value of the cookie.
-- `expiry` A [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) object of the cookies expiry date.
+- `expiry` A [Date](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date) object of the cookies expiry date or `null`, if the cookie expires with the session.
 - `domain` The domain the cookie is valid for.
 - `path` The path the cookie is valid for.
 - `secure` A boolean value representing the cookie's secure attribute. If set the cookie will only be used for `https` requests.
-- `subdomains` A boolean value specifying whether the cookie should be used for subdomains of the domain or not.
+- `subdomains` A boolean value specifying whether the cookie should be used for requests to subdomains of `domain` or not.
 
 #### new Cookie(cookie, url)
 - `cookie` The string representation of a cookie as send by a webserver.
@@ -93,8 +93,8 @@ Creates a cookie instance from an already existing object with the same properti
 #### serialize()
 Serializes the cookie, transforming it to `name=value` so it can be used in requests.
 
-#### hasExpired()
-Returns whether the cookie has expired or not.
+#### hasExpired(sessionEnded)
+Returns whether the cookie has expired or not. `sessionEnded` specifies whether the current session has ended, meaning if set to `true`, the function will return `true` for session cookies.
 
 #### isValidForRequest(url)
 Returns whether the cookie is valid for a request to `url`. If not, it won't be send by the fetch wrapper.

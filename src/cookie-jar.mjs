@@ -45,9 +45,9 @@ export default class CookieJar {
         for(const cookie of (this.cookies.get(domain) || []).values())
             yield cookie;
     }
-    *cookiesValid() {
+    *cookiesValid(withSession) {
         for(const cookie of this.cookiesAll())
-            if(!cookie.hasExpired())
+            if(!cookie.hasExpired(!withSession))
                 yield cookie;
     }
     *cookiesAll() {
@@ -73,7 +73,7 @@ export default class CookieJar {
         }
     }
     deleteExpired() {
-        const validCookies = [...this.cookiesValid()];
+        const validCookies = [...this.cookiesValid(false)];
         this.cookies = new Map();
         validCookies.forEach(c => this.addCookie(c));
     }
@@ -81,6 +81,6 @@ export default class CookieJar {
         if(typeof this.file !== "string")
             throw new Error("No file has been specified for this cookie jar!");
         // only save cookies that haven't expired
-        fs.writeFileSync(this.file, JSON.stringify([...this.cookiesValid()]));
+        fs.writeFileSync(this.file, JSON.stringify([...this.cookiesValid(false)]));
     }
 };
