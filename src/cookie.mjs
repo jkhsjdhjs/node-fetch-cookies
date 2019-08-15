@@ -74,9 +74,8 @@ export default class Cookie {
                     this.domain = v;
                     this.subdomains = true;
                 }
-                else if(k === "path") {
+                else if(k === "path")
                     this.path = v;
-                }
                 else if(k === "samesite") // only relevant for cross site requests, so not for us
                     continue;
                 else
