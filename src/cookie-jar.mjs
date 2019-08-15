@@ -13,8 +13,6 @@ export default class CookieJar {
             throw new TypeError("Second parameter is not a string!");
         if(this.file && fs.existsSync(this.file))
             this.addFromFile(this.file);
-        else
-            this.cookies = new Map();
         if(Array.isArray(cookies)) {
             if(!cookies.every(c => c instanceof Cookie))
                 throw new TypeError("Third parameter is not an array of cookies!");
