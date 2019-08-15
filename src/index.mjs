@@ -34,9 +34,8 @@ async function cookieFetch(cookieJars, url, options) {
                 .filter(jar => jar.flags.includes("w"))
                 .forEach(jar => cookies.forEach(c => jar.addCookie(c, url)));
         }
-        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("w")) {
+        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("w"))
             cookies.forEach(c => cookieJars.addCookie(c, url));
-        }
     }
     return result;
 }

@@ -1,5 +1,12 @@
 import url from "url";
 
+class CookieParseError extends Error {
+    constructor(...args) {
+        super(...args);
+        this.name = "CookieParseError";
+    }
+}
+
 const validateHostname = (cookieHostname, requestHostname, subdomains) => {
     cookieHostname = cookieHostname.toLowerCase();
     requestHostname = requestHostname.toLowerCase();
@@ -9,8 +16,8 @@ const validateHostname = (cookieHostname, requestHostname, subdomains) => {
 };
 
 const validatePath = (cookiePath, requestPath) => {
-    cookiePath = cookiePath.toLowerCase();
-    requestPath = requestPath.toLowerCase();
+    cookiePath = decodeURIComponent(cookiePath).toLowerCase();
+    requestPath = decodeURIComponent(requestPath).toLowerCase();
     if(cookiePath.endsWith("/"))
         cookiePath = cookiePath.slice(0, -1);
     if(requestPath.endsWith("/"))
@@ -35,9 +42,11 @@ export default class Cookie {
         const splitted = str.split("; ");
         [this.name, this.value] = splitN(splitted[0], "=", 1);
         if(!this.name)
-            throw new Error("Invalid cookie name \"" + this.name + "\"");
+            throw new CookieParseError("Invalid cookie name \"" + this.name + "\"");
         if(this.value.startsWith("\"") && this.value.endsWith("\""))
             this.value = this.value.slice(1, -1);
+
+        const parsedURL = url.parse(requestURL);
 
         for(let i = 1; i < splitted.length; i++) {
             let [k, v] = splitN(splitted[i], "=", 1);
@@ -48,18 +57,20 @@ export default class Cookie {
                         continue;
                     if(!/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), \d{2}[ -](?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[ -]\d{2,4} \d{2}:\d{2}:\d{2} GMT$/.test(v)
                         || (this.expiry = new Date(v)) === "Invalid Date")
-                        throw new Error("Invalid value for Expires \"" + v + "\"!");
+                        throw new CookieParseError("Invalid value for Expires \"" + v + "\"!");
                 }
                 else if(k === "max-age") {
                     const seconds = ~~+v;
                     if(seconds.toString() !== v)
-                        throw new Error("Invalid value for Max-Age \"" + v + "\"!");
+                        throw new CookieParseError("Invalid value for Max-Age \"" + v + "\"!");
                     this.expiry = new Date();
                     this.expiry.setSeconds(this.expiry.getSeconds() + seconds);
                 }
                 else if(k === "domain") {
                     if(v.startsWith("."))
                         v = v.substring(1);
+                    if(!validateHostname(parsedURL.hostname, v, true))
+                        throw new CookieParseError("Invalid value for Domain \"" + v + "\": cookie was received from \"" + parsedURL.hostname + "\"!");
                     this.domain = v;
                     this.subdomains = true;
                 }
@@ -69,7 +80,7 @@ export default class Cookie {
                 else if(k === "samesite") // only relevant for cross site requests, so not for us
                     continue;
                 else
-                    throw new Error("Invalid key \"" + k + "\" with value \"" + v + "\" specified!");
+                    throw new CookieParseError("Invalid key \"" + k + "\" with value \"" + v + "\" specified!");
             }
             else {
                 if(k === "secure")
@@ -77,16 +88,14 @@ export default class Cookie {
                 else if(k === "httponly") // only relevant for browsers
                     continue;
                 else
-                    throw new Error("Invalid key \"" + k + "\" without value specified!");
+                    throw new CookieParseError("Invalid key \"" + k + "\" specified!");
             }
         }
 
-        const parsedURL = url.parse(requestURL);
-
         if(this.name.toLowerCase().startsWith("__secure-") && (!this.secure || parsedURL.protocol !== "https:"))
-            throw new Error("Cookie has \"__Secure-\" prefix but \"Secure\" isn't set or the cookie is not set via https!");
-        if(this.name.toLowerCase().startsWith("__host-") && (!this.secure || parsedURL.protocol !== "https:" || this.domain))
-            throw new Error("Cookie has \"__Host-\" prefix but \"Secure\" isn't set, the cookie is not set via https, \"Domain\" is set or \"Path\" is not equal to \"/\"!");
+            throw new CookieParseError("Cookie has \"__Secure-\" prefix but \"Secure\" isn't set or the cookie is not set via https!");
+        if(this.name.toLowerCase().startsWith("__host-") && (!this.secure || parsedURL.protocol !== "https:" || this.domain || (this.path && this.path !== "/")))
+            throw new CookieParseError("Cookie has \"__Host-\" prefix but \"Secure\" isn't set, the cookie is not set via https, \"Domain\" is set or \"Path\" is not equal to \"/\"!");
 
         // assign defaults
         if(!this.domain) {

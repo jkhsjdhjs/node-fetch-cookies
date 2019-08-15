@@ -46,6 +46,9 @@ Adds a cookie to the jar.
 - `cookie` A [Cookie](#class-cookie) instance to add to the cookie jar. Alternatively this can also be a string, for example a serialized cookie received from a website. In this case `url` should be specified.
 - `url` The url a cookie has been received from.
 
+Returns `true` if the cookie has been added successfully. Returns `false` otherwise.
+Will log a warning to console if a cookie fails to be parsed.
+
 #### addFromFile(file)
 Reads a cookie jar from the disk and adds the contained cookies.
 
@@ -64,8 +67,8 @@ Returns an iterator over all cookies currently stored.
 #### *cookiesValidForRequest(url)
 Returns an iterator over all cookies valid for a request to `url`.
 
-#### deleteExpired()
-Removes all expired cookies from the jar (including session cookies).
+#### deleteExpired(sessionEnded)
+Removes all expired cookies from the jar (including session cookies, if `sessionEnded` is `true`).
 
 #### save()
 Saves the cookie jar to disk. Only non-expired non-session cookies are saved.
@@ -87,6 +90,8 @@ An abstract representation of a cookie.
 - `cookie` The string representation of a cookie as send by a webserver.
 - `url` The url the cookie has been received from.
 
+Will throw a `CookieParseError` if the input couldn't be parsed.
+
 #### static fromObject(obj)
 Creates a cookie instance from an already existing object with the same properties.
 
@@ -98,6 +103,7 @@ Returns whether the cookie has expired or not. `sessionEnded` specifies whether 
 
 #### isValidForRequest(url)
 Returns whether the cookie is valid for a request to `url`. If not, it won't be send by the fetch wrapper.
+
 
 ## License
 This project is licensed under the MIT license, see [LICENSE](LICENSE).
