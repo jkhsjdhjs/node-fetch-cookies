@@ -118,7 +118,7 @@ export default class Cookie {
         return this.name + "=" + this.value;
     }
     hasExpired(sessionEnded) {
-        return sessionEnded && this.expiry === null || this.expiry < new Date();
+        return sessionEnded && this.expiry === null || this.expiry && this.expiry < new Date();
     }
     isValidForRequest(requestURL) {
         if(this.hasExpired(false))
