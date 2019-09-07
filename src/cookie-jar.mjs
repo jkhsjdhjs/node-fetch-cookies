@@ -1,6 +1,6 @@
 import fs from "fs";
 import url from "url";
-import Cookie from "./cookie";
+import Cookie from "./cookie.mjs";
 
 export default class CookieJar {
     constructor(flags, file, cookies) {

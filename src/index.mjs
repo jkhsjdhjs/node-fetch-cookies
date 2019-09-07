@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
-import CookieJar from "./cookie-jar";
-import Cookie from "./cookie";
+import CookieJar from "./cookie-jar.mjs";
+import Cookie from "./cookie.mjs";
 
 async function cookieFetch(cookieJars, url, options) {
     let cookies = "";

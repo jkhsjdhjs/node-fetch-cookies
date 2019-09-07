@@ -1,11 +1,14 @@
 {
   "name": "node-fetch-cookies",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "node-fetch wrapper that adds support for cookie-jars",
   "main": "src/index.mjs",
   "engines": {
     "node": ">=10.0.0"
   },
+  "files": [
+    "src/"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
