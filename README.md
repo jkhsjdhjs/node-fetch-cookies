@@ -148,7 +148,7 @@ Returns whether the cookie is valid for a request to `url`.
 This change has been introduced to simplify the usage of this library, since `rw` is used for `flags` in most cases anyways.
 - `CookieJar.addFromFile(file)` has been renamed to the async function `async CookieJar.load([file = this.file])`, which uses the fsPromises API for non-blocking cookie loading.  
 The default value for `file` is the file passed to the constructor.
-- `CookieJar.save(file)` was moved to `async CookieJar.save([file = this.file]) now also uses the fsPromises API.
+- `CookieJar.save(file)` was moved to `async CookieJar.save([file = this.file])` now also uses the fsPromises API.
 - `new CookieJar()` now doesn't load cookies from the specified file anymore. To do so, call `await CookieJar.load()` after creating the CookieJar.  
 **NOTE: `CookieJar.load()` will throw an error if the cookie jar doesn't exist or doesn't contain valid JSON!**
 
