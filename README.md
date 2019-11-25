@@ -1,6 +1,10 @@
 # node-fetch-cookies
+
 A [node-fetch](https://github.com/bitinn/node-fetch) wrapper with support for cookies.
 It supports reading/writing from/to a JSON cookie jar and keeps cookies in memory until you call `CookieJar.save()` to reduce disk I/O.
+
+## For upgrading to version 1.3.0 see [1.3.0 Breaking API Changes](#1.3.0-breaking-api-changes).
+
 
 ## Usage Examples
 ### with file...
@@ -9,13 +13,16 @@ import {fetch, CookieJar} from "node-fetch-cookies";
 
 (async () => {
     // creates a CookieJar instance
-    const cookieJar = new CookieJar("rw", "jar.json");
+    const cookieJar = new CookieJar("jar.json");
+
+    // load cookies from the cookie jar
+    await cookieJar.load();
 
     // usual fetch usage, except with one or multiple cookie jars as first parameter
     const response = await fetch(cookieJar, "https://example.com");
 
     // save the received cookies to disk
-    cookieJar.save();
+    await cookieJar.save();
 })();
 ```
 
@@ -24,7 +31,7 @@ import {fetch, CookieJar} from "node-fetch-cookies";
 import {fetch, CookieJar} from "node-fetch-cookies";
 
 (async () => {
-    const cookieJar = new CookieJar("rw");
+    const cookieJar = new CookieJar();
 
     // log in to some api
     let response = await fetch(cookieJar, "https://example.com/api/login", {
@@ -56,12 +63,12 @@ A class that stores cookies.
 - `file` The path of the cookie jar on the disk.
 - `cookies` A [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) mapping hostnames to maps, which map cookie names to the respective [Cookie](#class-cookie) instance.
 
-#### new CookieJar(flags[, file, cookies])
-- `flags` A string specifying whether cookies should be read and/or written from/to the jar when passing it as parameter to [fetch](#fetchcookiejar-url-options).
+#### new CookieJar([file, flags = `rw` cookies])
+- `file` An optional string containing a relative or absolute path to the file on the disk to use.
+- `flags` An optional string specifying whether cookies should be read and/or written from/to the jar when passing it as parameter to [fetch](#fetchcookiejar-url-options). Default: `rw`
     - `r`: only read from this jar
     - `w`: only write to this jar
     - `rw` or `wr`: read/write from/to this jar
-- `file` An optional string containing a relative or absolute path to the file on the disk to use.
 - `cookies` An optional initializer for the cookie jar - either an array of [Cookie](#class-cookie) instances or a single Cookie instance.
 
 #### addCookie(cookie[, fromURL])
@@ -73,9 +80,6 @@ In this case `fromURL` must be specified.
 
 Returns `true` if the cookie has been added successfully. Returns `false` otherwise.
 Will log a warning to console if a cookie fails to be parsed.
-
-#### addFromFile(file)
-Reads cookies from `file` on the disk and adds the contained cookies.
 
 #### domains()
 Returns an iterator over all domains currently stored cookies for.
@@ -97,9 +101,13 @@ Returns an iterator over all cookies valid for a request to `url`.
 Removes all expired cookies from the jar.
 - `sessionEnded`: A boolean. Also removes session cookies if set to `true`.
 
-#### save()
-Saves the cookie jar to disk. Only non-expired non-session cookies are saved.
+#### async load([file = this.file])
+Reads cookies from `file` on the disk and adds the contained cookies.
+- `file`: Path to the file where the cookies should be saved. Default: `this.file`, the file that has been passed to the constructor.
 
+#### async save([file = this.file])
+Saves the cookie jar to `file` on the disk. Only non-expired non-session cookies are saved.
+- `file`: Path to the file where the cookies should be saved. Default: `this.file`, the file that has been passed to the constructor.
 
 ### Class: Cookie
 An abstract representation of a cookie.
@@ -132,6 +140,17 @@ Returns whether the cookie has expired or not.
 
 #### isValidForRequest(url)
 Returns whether the cookie is valid for a request to `url`.
+
+
+## 1.3.0 Breaking API Changes
+- `new CookieJar(flags, file, cookies)` has been changed to `new CookieJar(file, flags = "rw", cookies)`.  
+`new CookieJar("rw")` can now be written as `new CookieJar()`, `new CookieJar("rw", "jar.json")` can now be written as `new CookieJar("jar.json")`.  
+This change has been introduced to simplify the usage of this library, since `rw` is used for `flags` in most cases anyways.
+- `CookieJar.addFromFile(file)` has been renamed to the async function `async CookieJar.load([file = this.file])`, which uses the fsPromises API for non-blocking cookie loading.  
+The default value for `file` is the file passed to the constructor.
+- `CookieJar.save(file)` was moved to `async CookieJar.save([file = this.file]) now also uses the fsPromises API.
+- `new CookieJar()` now doesn't load cookies from the specified file anymore. To do so, call `await CookieJar.load()` after creating the CookieJar.  
+**NOTE: `CookieJar.load()` will throw an error if the cookie jar doesn't exist or doesn't contain valid JSON!**
 
 
 ## License

@@ -1,22 +1,28 @@
-import fetch from "node-fetch";
+import _fetch from "node-fetch";
 import CookieJar from "./cookie-jar.mjs";
 import Cookie from "./cookie.mjs";
+import { paramError } from "./errors.mjs"
 
-async function cookieFetch(cookieJars, url, options) {
+async function fetch(cookieJars, url, options) {
     let cookies = "";
-    const addValidFromJars = jars =>
-        jars
-            .map(jar => [...jar.cookiesValidForRequest(url)])
-            .reduce((a, b) => [...a, ...b])
-            .filter((v, i, a) => a.slice(0, i).every(c => c.name !== v.name)) // filter cookies with duplicate names
-            .forEach(c => cookies += c.serialize() + "; ");
+    const addValidFromJars = jars => {
+        // since multiple cookie jars can be passed, filter duplicates by using a set of cookie names
+        const set = new Set();
+        jars.flatMap(jar => [...jar.cookiesValidForRequest(url)])
+            .forEach(cookie => {
+                if(set.has(cookie.name))
+                    return;
+                set.add(cookie.name);
+                cookies += cookie.serialize() + "; ";
+            });
+    };
     if(cookieJars) {
         if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar))
             addValidFromJars(cookieJars.filter(jar => jar.flags.includes("r")));
         else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r"))
             addValidFromJars([cookieJars]);
         else
-            throw new TypeError("First paramter is neither a cookie jar nor an array of cookie jars!");
+            throw paramError("First", "cookieJars", "fetch", ["CookieJar", "[CookieJar]"]);
     }
     if(cookies) {
         if(!options)
@@ -25,8 +31,8 @@ async function cookieFetch(cookieJars, url, options) {
             options.headers = {};
         options.headers.cookie = cookies.slice(0, -2);
     }
-    const result = await fetch(url, options);
-    // i cannot use headers.get() here because it joins the cookies to a string
+    const result = await _fetch(url, options);
+    // I cannot use headers.get() here because it joins the cookies to a string
     cookies = result.headers[Object.getOwnPropertySymbols(result.headers)[0]]["set-cookie"];
     if(cookies && cookieJars) {
         if(Array.isArray(cookieJars)) {
@@ -40,4 +46,4 @@ async function cookieFetch(cookieJars, url, options) {
     return result;
 }
 
-export {cookieFetch as fetch, CookieJar, Cookie};
+export {fetch, CookieJar, Cookie};

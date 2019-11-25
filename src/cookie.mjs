@@ -1,11 +1,5 @@
 import url from "url";
-
-class CookieParseError extends Error {
-    constructor(...args) {
-        super(...args);
-        this.name = "CookieParseError";
-    }
-}
+import { paramError, CookieParseError } from "./errors.mjs";
 
 const validateHostname = (cookieHostname, requestHostname, subdomains) => {
     cookieHostname = cookieHostname.toLowerCase();
@@ -37,7 +31,7 @@ const splitN = (str, sep, n) => {
 export default class Cookie {
     constructor(str, requestURL) {
         if(typeof str !== "string")
-            throw new TypeError("First parameter is not a string!");
+            throw paramError("First", "str", "new Cookie()", "string");
 
         const splitted = str.split("; ");
         [this.name, this.value] = splitN(splitted[0], "=", 1);

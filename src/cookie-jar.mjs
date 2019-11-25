@@ -1,53 +1,47 @@
-import fs from "fs";
+import { promises as fs } from "fs";
 import url from "url";
 import Cookie from "./cookie.mjs";
+import { paramError, CookieParseError } from "./errors.mjs";
 
 export default class CookieJar {
-    constructor(flags, file, cookies) {
-        this.cookies = new Map();
-        this.file = file;
+    constructor(file, flags = "rw", cookies) {
         this.flags = flags;
+        this.file = file;
+        this.cookies = new Map();
         if(typeof this.flags !== "string")
-            throw new TypeError("First parameter is not a string!");
+            throw paramError("First", "flags", "new CookieJar()", "string");
         if(this.file && typeof this.file !== "string")
-            throw new TypeError("Second parameter is not a string!");
-        if(this.file && fs.existsSync(this.file))
-            this.addFromFile(this.file);
+            throw paramError("Second", "file", "new CookieJar()", "string");
         if(Array.isArray(cookies)) {
             if(!cookies.every(c => c instanceof Cookie))
-                throw new TypeError("Third parameter is not an array of cookies!");
-            else
-                cookies.forEach(cookie => this.addCookie(cookie));
+                throw paramError("Third", "cookies", "new CookieJar()", "[Cookie]");
+            cookies.forEach(cookie => this.addCookie(cookie));
         }
         else if(cookies instanceof Cookie)
             this.addCookie(cookies);
         else if(cookies)
-            throw new TypeError("Third parameter is neither an array nor a cookie!");
+            throw paramError("Third", "cookies", "new CookieJar()", ["[Cookie]", "Cookie"]);
     }
-    addCookie(c, fromURL) {
-        if(typeof c === "string") {
+    addCookie(cookie, fromURL) {
+        if(typeof cookie === "string") {
             try {
-                c = new Cookie(c, fromURL);
+                cookie = new Cookie(cookie, fromURL);
             }
             catch(error) {
-                if(error.name === "CookieParseError") {
-                    console.warn("Ignored cookie: " + c);
+                if(error instanceof CookieParseError) {
+                    console.warn("Ignored cookie: " + cookie);
                     console.warn("Reason: " + error.message);
                     return false;
                 }
-                else
-                    throw error;
+                throw error;
             }
         }
-        else if(!(c instanceof Cookie))
-            throw new TypeError("First parameter is neither a string nor a cookie!");
-        if(!this.cookies.get(c.domain))
-            this.cookies.set(c.domain, new Map());
-        this.cookies.get(c.domain).set(c.name, c);
+        else if(!(cookie instanceof Cookie))
+            throw paramError("First", "cookie", "CookieJar.addCookie()", ["string", "Cookie"]);
+        if(!this.cookies.get(cookie.domain))
+            this.cookies.set(cookie.domain, new Map());
+        this.cookies.get(cookie.domain).set(cookie.name, cookie);
         return true;
-    }
-    addFromFile(file) {
-        JSON.parse(fs.readFileSync(this.file)).forEach(c => this.addCookie(Cookie.fromObject(c)));
     }
     domains() {
         return this.cookies.keys();
@@ -66,7 +60,7 @@ export default class CookieJar {
             yield* this.cookiesDomain(domain);
     }
     *cookiesValidForRequest(requestURL) {
-        const namesYielded = [],
+        const namesYielded = new Set(),
               domains = url
                 .parse(requestURL)
                 .hostname
@@ -76,8 +70,8 @@ export default class CookieJar {
         for(const domain of domains) {
             for(const cookie of this.cookiesDomain(domain)) {
                 if(cookie.isValidForRequest(requestURL)
-                && namesYielded.every(name => name !== cookie.name)) {
-                    namesYielded.push(cookie.name);
+                && !namesYielded.has(cookie.name)) {
+                    namesYielded.add(cookie.name);
                     yield cookie;
                 }
             }
@@ -88,10 +82,15 @@ export default class CookieJar {
         this.cookies = new Map();
         validCookies.forEach(c => this.addCookie(c));
     }
-    save() {
-        if(typeof this.file !== "string")
+    async load(file = this.file) {
+        if(typeof file !== "string")
+            throw new Error("No file has been specified for this cookie jar!");
+        JSON.parse(await fs.readFile(file)).forEach(c => this.addCookie(Cookie.fromObject(c)));
+    }
+    async save(file = this.file) {
+        if(typeof file !== "string")
             throw new Error("No file has been specified for this cookie jar!");
         // only save cookies that haven't expired
-        fs.writeFileSync(this.file, JSON.stringify([...this.cookiesValid(false)]));
+        await fs.writeFile(this.file, JSON.stringify([...this.cookiesValid(false)]));
     }
 };
