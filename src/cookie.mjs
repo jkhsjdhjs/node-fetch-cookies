@@ -1,5 +1,5 @@
 import url from "url";
-import { paramError, CookieParseError } from "./errors.mjs";
+import {paramError, CookieParseError} from "./errors.mjs";
 
 const validateHostname = (cookieHostname, requestHostname, subdomains) => {
     cookieHostname = cookieHostname.toLowerCase();
