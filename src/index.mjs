@@ -1,7 +1,7 @@
 import _fetch from "node-fetch";
 import CookieJar from "./cookie-jar.mjs";
 import Cookie from "./cookie.mjs";
-import { paramError } from "./errors.mjs"
+import { paramError, CookieParseError } from "./errors.mjs"
 
 async function fetch(cookieJars, url, options) {
     let cookies = "";
@@ -46,4 +46,4 @@ async function fetch(cookieJars, url, options) {
     return result;
 }
 
-export {fetch, CookieJar, Cookie};
+export {fetch, CookieJar, Cookie, CookieParseError};

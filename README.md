@@ -47,6 +47,7 @@ import {fetch, CookieJar} from "node-fetch-cookies";
 })();
 ```
 
+
 ## Documentation
 
 ### async fetch(cookieJar, url[, options])
@@ -78,8 +79,8 @@ Alternatively this can also be a string, for example a serialized cookie receive
 In this case `fromURL` must be specified.
 - `fromURL` The url a cookie has been received from.
 
-Returns `true` if the cookie has been added successfully. Returns `false` otherwise.
-Will log a warning to console if a cookie fails to be parsed.
+Returns `true` if the cookie has been added successfully. Returns `false` otherwise.  
+If the parser throws a [CookieParseError](#class-cookieparseerror) it will be caught and a warning will be printed to console.
 
 #### domains()
 Returns an iterator over all domains currently stored cookies for.
@@ -140,6 +141,9 @@ Returns whether the cookie has expired or not.
 
 #### isValidForRequest(url)
 Returns whether the cookie is valid for a request to `url`.
+
+### Class: CookieParseError
+The Error that is thrown when the cookie parser located in the constructor of the [Cookie](#class-cookie) class is unable to parse the input.
 
 
 ## 1.3.0 Breaking API Changes
