@@ -3,7 +3,7 @@
 A [node-fetch](https://github.com/bitinn/node-fetch) wrapper with support for cookies.
 It supports reading/writing from/to a JSON cookie jar and keeps cookies in memory until you call `CookieJar.save()` to reduce disk I/O.
 
-### For upgrading from 1.2.x or below to 1.3.x, please read the [breaking API changes](#130-breaking-api-changes).
+### For upgrading from 1.2.x or below to 1.3.x or above, please read the [breaking API changes](#130-breaking-api-changes).
 
 
 ## Usage Examples
