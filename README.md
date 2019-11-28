@@ -95,7 +95,7 @@ Returns an iterator over all valid (non-expired) cookies.
 #### *cookiesAll()
 Returns an iterator over all cookies currently stored.
 
-#### *cookiesValidForRequest(url)
+#### *cookiesValidForRequest(requestURL)
 Returns an iterator over all cookies valid for a request to `url`.
 
 #### deleteExpired(sessionEnded)
@@ -122,7 +122,7 @@ An abstract representation of a cookie.
 - `secure` A boolean value representing the cookie's secure attribute. If set the cookie will only be used for `https` requests.
 - `subdomains` A boolean value specifying whether the cookie should be used for requests to subdomains of `domain` or not.
 
-#### new Cookie(str, url)
+#### new Cookie(str, requestURL)
 Creates a cookie instance from the string representation of a cookie as send by a webserver.
 - `str` The string representation of a cookie.
 - `url` The url the cookie has been received from.
@@ -139,7 +139,7 @@ Serializes the cookie, transforming it to `name=value` so it can be used in requ
 Returns whether the cookie has expired or not.
 - `sessionEnded`: A boolean that specifies whether the current session has ended, meaning if set to `true`, the function will return `true` for session cookies.
 
-#### isValidForRequest(url)
+#### isValidForRequest(requestURL)
 Returns whether the cookie is valid for a request to `url`.
 
 ### Class: CookieParseError
