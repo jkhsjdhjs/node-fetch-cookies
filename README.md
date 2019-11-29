@@ -50,8 +50,8 @@ import {fetch, CookieJar} from "node-fetch-cookies";
 
 ## Documentation
 
-### async fetch(cookieJar, url[, options])
-- `cookieJar` A [CookieJar](#class-cookiejar) instance, an array of CookieJar instances or null, if you don't want to send or store cookies.
+### async fetch(cookieJars, url[, options])
+- `cookieJars` A [CookieJar](#class-cookiejar) instance, an array of CookieJar instances or null, if you don't want to send or store cookies.
 - `url` and `options` as in https://github.com/bitinn/node-fetch#fetchurl-options
 
 Returns a Promise resolving to a [Response](https://github.com/bitinn/node-fetch#class-response) instance on success.

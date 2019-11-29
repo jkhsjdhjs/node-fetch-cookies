@@ -37,7 +37,7 @@ export default class Cookie {
 
         // check if url is valid
         new url.URL(requestURL);
-        
+
         const splitted = str.split("; ");
         [this.name, this.value] = splitN(splitted[0], "=", 1);
         if(!this.name)
