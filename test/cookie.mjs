@@ -2,7 +2,7 @@ import Cookie from "../src/cookie.mjs";
 import {CookieParseError} from "../src/errors.mjs";
 
 export default Test => [
-    new Test("cookie parser", () => {
+    new Test("new Cookie() / cookie parser", () => {
         const inputs = [
             [ // type error
                 123,
@@ -142,7 +142,7 @@ export default Test => [
                 "https://github.com"
             ],
             [ // success max-age takes precendence over expires
-                "id=a3fWa; Max-Age=1000; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+                "id=\"a3fWa\"; Max-Age=1000; Expires=Thu, 01 Jan 1970 00:00:00 GMT",
                 "https://github.com"
             ],
         ];
@@ -281,5 +281,50 @@ export default Test => [
                 path: "/"
             }
         );
+    }),
+    new Test("static Cookie.fromObject()", () => {
+        const date = new Date();
+        const inputs = [
+            {
+                name: "testname",
+                value: "somevalue",
+                secure: false,
+                domain: "github.com",
+                subdomains: false,
+                path: "/",
+                expiry: "2019-12-25T03:58:52.000Z"
+            },
+            {
+                name: "testname",
+                domain: "somedomain.tld",
+                path: "/lel/",
+                expiry: date,
+                secure: true,
+                subdomains: true,
+                value: "lul"
+            }
+        ];
+
+        const cookies = inputs.map(i => Cookie.fromObject(i));
+
+        return cookies[0].name === "testname"
+            && cookies[0].value === "somevalue"
+            && cookies[0].domain === "github.com"
+            && cookies[0].path === "/"
+            && cookies[0].expiry.getTime() === new Date(inputs[0].expiry).getTime()
+            && cookies[0].secure === false
+            && cookies[0].subdomains === false
+
+            && cookies[1].name === "testname"
+            && cookies[1].value === "lul"
+            && cookies[1].domain === "somedomain.tld"
+            && cookies[1].path === "/lel/"
+            && cookies[1].expiry.getTime() === date.getTime()
+            && cookies[1].secure === true
+            && cookies[1].subdomains === true;
+    }),
+    new Test("Cookie.serialize()", () => {
+        return new Cookie("abc=def; Expires=Wed, 20 Oct 2018 08:08:08 GMT; Path=/", "https://somedomain.tld").serialize() === "abc=def"
+            && new Cookie("jkhsd231=ajkshdgi", "https://somedomain.tld").serialize() === "jkhsd231=ajkshdgi";
     })
 ];
