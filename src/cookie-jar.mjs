@@ -4,14 +4,11 @@ import Cookie from "./cookie.mjs";
 import {paramError, CookieParseError} from "./errors.mjs";
 
 export default class CookieJar {
-    constructor(file, flags = "rw", cookies) {
-        this.flags = flags;
-        this.file = file;
-        this.cookies = new Map();
-        if(typeof this.flags !== "string")
-            throw paramError("First", "flags", "new CookieJar()", "string");
-        if(this.file && typeof this.file !== "string")
+    constructor(file, flags = "rw", cookies, cookieIgnoreCallback) {
+        if(file && typeof file !== "string")
             throw paramError("Second", "file", "new CookieJar()", "string");
+        if(typeof flags !== "string")
+            throw paramError("First", "flags", "new CookieJar()", "string");
         if(Array.isArray(cookies)) {
             if(!cookies.every(c => c instanceof Cookie))
                 throw paramError("Third", "cookies", "new CookieJar()", "[Cookie]");
@@ -21,6 +18,12 @@ export default class CookieJar {
             this.addCookie(cookies);
         else if(cookies)
             throw paramError("Third", "cookies", "new CookieJar()", ["[Cookie]", "Cookie"]);
+        if(cookieIgnoreCallback && typeof cookieIgnoreCallback !== "function")
+            throw paramError("Fourth", "cookieIgnoreCallback", "new CookieJar()", "function");
+        this.file = file;
+        this.flags = flags;
+        this.cookies = new Map();
+        this.cookieIgnoreCallback = cookieIgnoreCallback;
     }
     addCookie(cookie, fromURL) {
         if(typeof cookie === "string") {
@@ -29,8 +32,8 @@ export default class CookieJar {
             }
             catch(error) {
                 if(error instanceof CookieParseError) {
-                    console.warn("Ignored cookie: " + cookie);
-                    console.warn("Reason: " + error.message);
+                    if(this.cookieIgnoreCallback)
+                        this.cookieIgnoreCallback(cookie, error.message);
                     return false;
                 }
                 throw error;

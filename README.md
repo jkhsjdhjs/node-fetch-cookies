@@ -64,13 +64,16 @@ A class that stores cookies.
 - `file` The path of the cookie jar on the disk.
 - `cookies` A [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) mapping hostnames to maps, which map cookie names to the respective [Cookie](#class-cookie) instance.
 
-#### new CookieJar([file, flags = `rw`, cookies])
+#### new CookieJar([file, flags = `rw`, cookies, cookieIgnoreCallback])
 - `file` An optional string containing a relative or absolute path to the file on the disk to use.
 - `flags` An optional string specifying whether cookies should be read and/or written from/to the jar when passing it as parameter to [fetch](#fetchcookiejar-url-options). Default: `rw`
     - `r`: only read from this jar
     - `w`: only write to this jar
     - `rw` or `wr`: read/write from/to this jar
 - `cookies` An optional initializer for the cookie jar - either an array of [Cookie](#class-cookie) instances or a single Cookie instance.
+- `cookieIgnoreCallback(cookie, reason)` An optional callback function which will be called when a cookie is ignored instead of added to the cookie jar.
+    - `cookie` The cookie string
+    - `reason` A string containing the reason why the cookie has been ignored
 
 #### addCookie(cookie[, fromURL])
 Adds a cookie to the jar.
