@@ -21,7 +21,7 @@ const tests = [
     const testResults = await Promise.all(tests.map(async t => {
         try {
             t.result = await t.runTest();
-            if(typeof t.result !== "boolean") {
+            if(t.result !== !!t.result) {
                 t.result = false;
                 console.error("test did not return a boolean: " + t.name);
             }
