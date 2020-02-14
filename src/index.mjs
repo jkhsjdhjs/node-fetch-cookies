@@ -19,8 +19,9 @@ async function fetch(cookieJars, url, options) {
     if(cookieJars) {
         if(Array.isArray(cookieJars) && cookieJars.every(c => c instanceof CookieJar))
             addValidFromJars(cookieJars.filter(jar => jar.flags.includes("r")));
-        else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("r"))
-            addValidFromJars([cookieJars]);
+        else if(cookieJars instanceof CookieJar)
+            if(cookieJars.flags.includes("r"))
+                addValidFromJars([cookieJars]);
         else
             throw paramError("First", "cookieJars", "fetch", ["CookieJar", "[CookieJar]"]);
     }
