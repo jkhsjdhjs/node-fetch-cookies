@@ -5,6 +5,8 @@ import {paramError, CookieParseError} from "./errors.mjs";
 
 export default class CookieJar {
     constructor(file, flags = "rw", cookies, cookieIgnoreCallback) {
+        this.cookies = new Map();
+        
         if(file && typeof file !== "string")
             throw paramError("Second", "file", "new CookieJar()", "string");
         if(typeof flags !== "string")
@@ -22,7 +24,6 @@ export default class CookieJar {
             throw paramError("Fourth", "cookieIgnoreCallback", "new CookieJar()", "function");
         this.file = file;
         this.flags = flags;
-        this.cookies = new Map();
         this.cookieIgnoreCallback = cookieIgnoreCallback;
     }
     addCookie(cookie, fromURL) {
