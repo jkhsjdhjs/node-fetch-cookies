@@ -1,7 +1,17 @@
 language: node_js
 node_js:
-    - node
-    - lts/*
-    - 11.14.0
+- node
+- lts/*
+- 11.14.0
 script:
-    - node --experimental-modules test/index.mjs
+- node --experimental-modules test/index.mjs
+
+deploy:
+  provider: npm
+  email: npm@totally.rip
+  api_key:
+    secure: 49x2b6FaWwTCfRXXl2CaQyADZ5cvWkxS/QHRjWOJaOyPVO0M/6H23EWGxu3xttUfKHv+RADrrWKiOnJhnOVD08wO/kpC3jizKQa7D3z08hLmt8lNf6I+gt3VjUnaM1JvEAtGruJcx0aUvbqEVEJ5EehPgE+4/IGCcYC0gF+xEU1ButyQprQspw333jAEBj+0EbwV3K8Tr8CdlpZHN2wh8uzSHGg1m6jMbVZcamI3uo1INoRzhGt5Fd4t5xPOfUYyFPMopCnXX8cwed5O3lgx8nFzhS7kSl8lJrCkhzrqmx/84s1mssEj6hvz6bH5zRwj9Om3wr/1N/Q76sP4Tf6kwbpMXZR/+1dUCgbdSV7XGqaUSDzsuOPUW9+cC/RBF0O0Cr/EfmvJx4Uy5pW/OcCAYBmmMxaupEkW583oGm3lTe66UW9x866j5HyG/z2ElsEDBJscpB2niB4pa71g+ypiJcWydruozOiejS+/Edy/cfM/JPmJv1BTpr8IntWKKsriVcrLXo1p+RMRAS1ZJzg+bU0wuBWTK4EbLE8663VBg4oTd9E1pwvpt5pnFKopeYtVLDX0Vtvd4+XQaUMf80Dx6mLrS1hWyLrt+fe1LX+1gNhwZFLDM0FZnnAaszzxVBAJlpD3F4hz7Jb6Q2ZRvNWP8DCNcJPtlcimSb8usk1eTDE=
+  on:
+    branch: master
+    tags: true
+    repo: jkhsjdhjs/node-fetch-cookies
