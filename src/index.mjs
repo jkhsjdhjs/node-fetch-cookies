@@ -40,7 +40,7 @@ async function fetch(cookieJars, url, options) {
     if (wantFollow) {
         options.redirect = 'manual'
     }
-    const result = await _fetch(url, options);
+    let result = await _fetch(url, options);
     // I cannot use headers.get() here because it joins the cookies to a string
     cookies = result.headers[Object.getOwnPropertySymbols(result.headers)[0]]["set-cookie"];
     if(cookies && cookieJars) {
@@ -55,7 +55,7 @@ async function fetch(cookieJars, url, options) {
     if (wantFollow && redirectStatus.has(result.status)) {
         const location = result.headers.get('Location')
         options.redirect = 'follow'
-        await fetch(cookieJars, location, options)
+        result = await fetch(cookieJars, location, options)
     }
     return result;
 }
