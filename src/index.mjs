@@ -1,9 +1,12 @@
 import _fetch from "node-fetch";
 import CookieJar from "./cookie-jar.mjs";
 import Cookie from "./cookie.mjs";
-import {paramError, CookieParseError} from "./errors.mjs"
+import { paramError, CookieParseError } from "./errors.mjs"
+
+const redirectStatus = new Set([301, 302, 303, 307, 308]);
 
 async function fetch(cookieJars, url, options) {
+    
     let cookies = "";
     const addValidFromJars = jars => {
         // since multiple cookie jars can be passed, filter duplicates by using a set of cookie names
@@ -32,6 +35,11 @@ async function fetch(cookieJars, url, options) {
             options.headers = {};
         options.headers.cookie = cookies.slice(0, -2);
     }
+    
+    let wantFollow = options && options.redirect && options.redirect === 'follow'
+    if (wantFollow) {
+        options.redirect = 'manual'
+    }
     const result = await _fetch(url, options);
     // I cannot use headers.get() here because it joins the cookies to a string
     cookies = result.headers[Object.getOwnPropertySymbols(result.headers)[0]]["set-cookie"];
@@ -43,6 +51,11 @@ async function fetch(cookieJars, url, options) {
         }
         else if(cookieJars instanceof CookieJar && cookieJars.flags.includes("w"))
             cookies.forEach(c => cookieJars.addCookie(c, url));
+    }
+    if (wantFollow && redirectStatus.has(result.status)) {
+        const location = result.headers.get('Location')
+        options.redirect = 'follow'
+        await fetch(cookieJars, location, options)
     }
     return result;
 }
