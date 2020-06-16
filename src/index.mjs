@@ -38,6 +38,7 @@ async function fetch(cookieJars, url, options) {
 
     const wantFollow = !options || !options.redirect || options.redirect === 'follow';
     if(wantFollow) {
+        if (!options) options = {};
         options.redirect = 'manual';
     }
     const result = await _fetch(url, options);
