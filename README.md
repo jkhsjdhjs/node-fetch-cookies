@@ -70,7 +70,7 @@ A class that stores cookies.
 -   `flags` The read/write flags as specified below.
 -   `file` The path of the cookie jar on the disk.
 -   `cookies` A [Map](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map) mapping hostnames to maps, which map cookie names to the respective [Cookie](#class-cookie) instance.
--   `cookieIgnoreCallback` The callback function passed to `new CookieJar()`, that is called whenever a cookie couldn't be added to the function.
+-   `cookieIgnoreCallback` The callback function passed to `new CookieJar()`, that is called whenever a cookie couldn't be parsed.
 
 #### new CookieJar([file, flags = `rw`, cookies, cookieIgnoreCallback])
 
