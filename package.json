@@ -1,34 +1,40 @@
 {
-  "name": "node-fetch-cookies",
-  "version": "1.3.6",
-  "description": "node-fetch wrapper that adds support for cookie-jars",
-  "main": "src/index.mjs",
-  "engines": {
-    "node": ">=11.14.0"
-  },
-  "files": [
-    "src/"
-  ],
-  "scripts": {
-    "test": "node test/index.mjs"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jkhsjdhjs/node-fetch-cookies.git"
-  },
-  "keywords": [
-    "cookie",
-    "cookie-jar",
-    "node-fetch",
-    "fetch"
-  ],
-  "author": "jkhsjdhjs",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jkhsjdhjs/node-fetch-cookies/issues"
-  },
-  "homepage": "https://github.com/jkhsjdhjs/node-fetch-cookies#readme",
-  "dependencies": {
-    "node-fetch": "^2.6.0"
-  }
+    "name": "node-fetch-cookies",
+    "version": "1.3.6",
+    "description": "node-fetch wrapper that adds support for cookie-jars",
+    "main": "src/index.mjs",
+    "engines": {
+        "node": ">=11.14.0"
+    },
+    "files": [
+        "src/"
+    ],
+    "scripts": {
+        "test": "npx eslint --ext mjs . && npx prettier --check package.json package-lock.json .travis.yml .prettierrc.json .eslintrc.json README.md && node --experimental-modules test/index.mjs"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jkhsjdhjs/node-fetch-cookies.git"
+    },
+    "keywords": [
+        "cookie",
+        "cookie-jar",
+        "node-fetch",
+        "fetch"
+    ],
+    "author": "jkhsjdhjs",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/jkhsjdhjs/node-fetch-cookies/issues"
+    },
+    "homepage": "https://github.com/jkhsjdhjs/node-fetch-cookies#readme",
+    "dependencies": {
+        "node-fetch": "^2.6.0"
+    },
+    "devDependencies": {
+        "eslint": "^7.2.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "prettier": "2.0.5"
+    }
 }
