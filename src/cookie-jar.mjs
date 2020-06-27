@@ -78,8 +78,7 @@ export default class CookieJar {
             domains = url
                 .parse(requestURL)
                 .hostname.split(".")
-                .map((_, i, a) => a.slice(i).join("."))
-                .slice(0, -1);
+                .map((_, i, a) => a.slice(i).join("."));
         for (const domain of domains) {
             for (const cookie of this.cookiesDomain(domain)) {
                 if (
