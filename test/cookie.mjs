@@ -466,5 +466,43 @@ export default Test => [
                 "https://somedomain.tld"
             ).serialize() === "jkhsd231=ajkshdgi"
         );
+    }),
+    new Test("Cookie.hasExpired()", () => {
+        return (
+            new Cookie(
+                "foo=bar; Expires=Wed, 20 Oct 2018 08:08:08 GMT",
+                "https://somedomain.tld"
+            ).hasExpired(false) &&
+            !new Cookie(
+                "foo=bar; Max-Age=20",
+                "https://somedomain.tld"
+            ).hasExpired(false) &&
+            new Cookie("foo=bar", "https://somedomain.tld").hasExpired(true) &&
+            !new Cookie("foo=bar", "https://somedomain.tld").hasExpired(false)
+        );
+    }),
+    new Test("Cookie.isValidForRequest()", () => {
+        const testCookies = [
+            new Cookie("foo=bar", "http://somedomain.tld"),
+            new Cookie("foo=bar", "https://localhost"),
+            new Cookie(
+                "foo=bar; Max-Age=20; Domain=foo.bar; Path=/test; Secure",
+                "https://foo.bar"
+            )
+        ];
+        return (
+            testCookies[0].isValidForRequest(
+                "https://somedomain.tld/foo/bar"
+            ) &&
+            !testCookies[0].isValidForRequest("https://lol.lel") &&
+            !testCookies[0].isValidForRequest("https://sub.somedomain.tld") &&
+            !testCookies[0].isValidForRequest("ftp://somedomain.tld") &&
+            testCookies[1].isValidForRequest("http://localhost/test") &&
+            !testCookies[2].isValidForRequest("http://foo.bar/test") &&
+            testCookies[2].isValidForRequest("https://foo.bar/test") &&
+            testCookies[2].isValidForRequest("https://foo.bar/test/test") &&
+            !testCookies[2].isValidForRequest("https://foo.bar/foo") &&
+            testCookies[2].isValidForRequest("https://sub.foo.bar/test")
+        );
     })
 ];

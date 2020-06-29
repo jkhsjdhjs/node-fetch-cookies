@@ -1,5 +1,7 @@
 import cookie from "./cookie.mjs";
+import cookieJar from "./cookie-jar.mjs";
 import errors from "./errors.mjs";
+import fetch from "./fetch.mjs";
 
 class Test {
     constructor(name, fnc) {
@@ -11,7 +13,7 @@ class Test {
     }
 }
 
-const tests = [cookie, errors].flatMap(t => t(Test));
+const tests = [cookie, cookieJar, errors, fetch].flatMap(t => t(Test));
 
 (async () => {
     console.log("running tests...");
