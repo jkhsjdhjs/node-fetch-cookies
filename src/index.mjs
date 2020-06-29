@@ -32,24 +32,18 @@ async function fetch(cookieJars, url, options) {
                     "[CookieJar]"
                 ]);
     }
-    if (cookies) {
-        if (!options) options = {};
-        if (!options.headers) options.headers = {};
-        options.headers.cookie = cookies.slice(0, -2);
-    }
 
     const wantFollow =
         !options || !options.redirect || options.redirect === "follow";
-    if (wantFollow) {
-        if (!options) options = {};
-        options.redirect = "manual";
+    if (!options && (cookies || wantFollow)) options = {};
+    if (cookies) {
+        if (!options.headers) options.headers = {};
+        options.headers.cookie = cookies.slice(0, -2);
     }
+    if (wantFollow) options.redirect = "manual";
     const result = await _fetch(url, options);
     // I cannot use headers.get() here because it joins the cookies to a string
-    cookies =
-        result.headers[Object.getOwnPropertySymbols(result.headers)[0]][
-            "set-cookie"
-        ];
+    cookies = result.headers.raw()["set-cookie"];
     if (cookies && cookieJars) {
         if (Array.isArray(cookieJars)) {
             cookieJars
@@ -62,7 +56,7 @@ async function fetch(cookieJars, url, options) {
             cookies.forEach(c => cookieJars.addCookie(c, url));
     }
     if (wantFollow && redirectStatus.has(result.status)) {
-        const location = result.headers.get("Location");
+        const location = result.headers.get("location");
         options.redirect = "follow";
         return fetch(cookieJars, location, options);
     }

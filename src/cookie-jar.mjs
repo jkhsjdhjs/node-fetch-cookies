@@ -6,7 +6,6 @@ import {paramError, CookieParseError} from "./errors.mjs";
 export default class CookieJar {
     constructor(file, flags = "rw", cookies, cookieIgnoreCallback) {
         this.cookies = new Map();
-
         if (file && typeof file !== "string")
             throw paramError("Second", "file", "new CookieJar()", "string");
         if (typeof flags !== "string")
@@ -54,7 +53,7 @@ export default class CookieJar {
                 "string",
                 "Cookie"
             ]);
-        if (!this.cookies.get(cookie.domain))
+        if (!this.cookies.has(cookie.domain))
             this.cookies.set(cookie.domain, new Map());
         this.cookies.get(cookie.domain).set(cookie.name, cookie);
         return true;
