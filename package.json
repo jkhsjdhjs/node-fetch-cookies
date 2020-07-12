@@ -1,6 +1,6 @@
 {
     "name": "node-fetch-cookies",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "description": "node-fetch wrapper that adds support for cookie-jars",
     "main": "src/index.mjs",
     "engines": {
@@ -33,7 +33,7 @@
     },
     "devDependencies": {
         "cookie-parser": "^1.4.5",
-        "eslint": "^7.2.0",
+        "eslint": "^7.4.0",
         "eslint-config-prettier": "^6.11.0",
         "eslint-plugin-prettier": "^3.1.4",
         "express": "^4.17.1",
