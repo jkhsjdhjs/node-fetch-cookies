@@ -79,7 +79,7 @@ export default class Cookie {
                     this.expiry.setSeconds(this.expiry.getSeconds() + seconds);
                 } else if (k === "domain") {
                     if (v.startsWith(".")) v = v.substring(1);
-                    if (!validateHostname(parsedURL.hostname, v, true))
+                    if (!validateHostname(v, parsedURL.hostname, true))
                         throw new CookieParseError(
                             'Invalid value for Domain "' +
                                 v +
