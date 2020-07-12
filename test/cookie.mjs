@@ -137,8 +137,8 @@ export default Test => [
             ],
             [
                 // cookie parse error domain is not a subdomain
-                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Domain=github.com",
-                "https://gist.github.com"
+                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Domain=gist.github.com",
+                "https://github.com"
             ],
             [
                 // cookie parse error domain is not a subdomain
@@ -162,13 +162,13 @@ export default Test => [
             ],
             [
                 // success
-                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Secure; HttpOnly; Path=/lul/; Domain=.usercontent.github.com",
-                "https://github.com"
+                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Secure; HttpOnly; Path=/lul/; Domain=.github.com",
+                "https://usercontent.github.com"
             ],
             [
                 // success
-                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Secure; HttpOnly; SameSite=Strict; Path=/lul/; Domain=usercontent.github.com",
-                "https://github.com"
+                "id=a3fWa; Expires=Wed, 21 Nov 2015 07:28:00 GMT; Secure; HttpOnly; SameSite=Strict; Path=/lul/; Domain=github.com",
+                "https://usercontent.github.com"
             ],
             [
                 // success max-age takes precendence over expires
@@ -305,7 +305,7 @@ export default Test => [
             catchErrorTypeMessageTest(
                 inputs[26],
                 CookieParseError,
-                'Invalid value for Domain "github.com": cookie was received from "gist.github.com"!'
+                'Invalid value for Domain "gist.github.com": cookie was received from "github.com"!'
             ) &&
             catchErrorTypeMessageTest(
                 inputs[27],
@@ -363,7 +363,7 @@ export default Test => [
                     name: "id",
                     value: "a3fWa",
                     secure: true,
-                    domain: "usercontent.github.com",
+                    domain: "github.com",
                     subdomains: true,
                     path: "/lul/"
                 }
@@ -377,7 +377,7 @@ export default Test => [
                     name: "id",
                     value: "a3fWa",
                     secure: true,
-                    domain: "usercontent.github.com",
+                    domain: "github.com",
                     subdomains: true,
                     path: "/lul/"
                 }
