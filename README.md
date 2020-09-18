@@ -1,6 +1,6 @@
 # node-fetch-cookies [![Build Status](https://travis-ci.org/jkhsjdhjs/node-fetch-cookies.svg?branch=master)](https://travis-ci.org/jkhsjdhjs/node-fetch-cookies)
 
-A [node-fetch](https://github.com/bitinn/node-fetch) wrapper with support for cookies.
+A [node-fetch](https://github.com/node-fetch/node-fetch) wrapper with support for cookies.
 It supports reading/writing from/to a JSON cookie jar and keeps cookies in memory until you call `CookieJar.save()` to reduce disk I/O.
 
 ### For upgrading from 1.2.x or below to 1.3.x or above, please read the [breaking API changes](#130-breaking-api-changes).
@@ -52,14 +52,30 @@ import {fetch, CookieJar} from "node-fetch-cookies";
 })();
 ```
 
+## Exports
+
+This module exports the following classes/functions:
+
+-   [`fetch`](#async-fetchcookiejars-url-options) _(default)_
+-   [`CookieJar`](#class-cookiejar)
+-   [`Cookie`](#class-cookie)
+-   [`CookieParseError`](#class-cookieparseerror)
+-   [`nodeFetch`](https://github.com/node-fetch/node-fetch#fetchurl-options)
+-   [`Headers`](https://github.com/node-fetch/node-fetch#class-headers)
+-   [`Request`](https://github.com/node-fetch/node-fetch#class-request)
+-   [`Response`](https://github.com/node-fetch/node-fetch#class-response)
+-   [`FetchError`](https://github.com/node-fetch/node-fetch#class-fetcherror)
+-   `isRedirect`: A function that accepts a number, more precisely an http status code as input, and returns, whether the status code is a redirect status code as a boolean.  
+    It is implemented in `node-fetch` and used by `node-fetch-cookies`. It is also exported here, because `node-fetch` exports it.
+
 ## Documentation
 
 ### async fetch(cookieJars, url[, options])
 
 -   `cookieJars` A [CookieJar](#class-cookiejar) instance, an array of CookieJar instances or null, if you don't want to send or store cookies.
--   `url` and `options` as in https://github.com/bitinn/node-fetch#fetchurl-options
+-   `url` and `options` as in https://github.com/node-fetch/node-fetch#fetchurl-options
 
-Returns a Promise resolving to a [Response](https://github.com/bitinn/node-fetch#class-response) instance on success.
+Returns a Promise resolving to a [Response](https://github.com/node-fetch/node-fetch#class-response) instance on success.
 
 ### Class: CookieJar
 
