@@ -1,9 +1,9 @@
-import nodeFetch from "node-fetch";
+import nodeFetch, {Headers, Request, Response, FetchError} from "node-fetch";
 import CookieJar from "./cookie-jar.mjs";
 import Cookie from "./cookie.mjs";
 import {paramError, CookieParseError} from "./errors.mjs";
 
-const {Headers, Request, Response, isRedirect, FetchError} = nodeFetch;
+const {isRedirect} = nodeFetch;
 
 async function fetch(cookieJars, url, options) {
     let cookies = "";
