@@ -1,14 +1,12 @@
 language: node_js
+node_js:
+    - node
+    - lts/*
+    - 14.13.0
+script: npm test
 
 jobs:
     include:
-        - stage: test
-          node_js:
-              - lts/*
-              - 14.13.0
-              - 14.12.0
-          script: npm test
-
         - stage: npm release
           if: branch = master AND repo = jkhsjdhjs/node-fetch-cookies
           script: skip
