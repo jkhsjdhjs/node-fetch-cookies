@@ -106,9 +106,6 @@ export default class CookieJar {
         if (typeof file !== "string")
             throw new Error("No file has been specified for this cookie jar!");
         // only save cookies that haven't expired
-        await fs.writeFile(
-            this.file,
-            JSON.stringify([...this.cookiesValid(false)])
-        );
+        await fs.writeFile(file, JSON.stringify([...this.cookiesValid(false)]));
     }
 }
