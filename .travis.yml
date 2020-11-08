@@ -8,7 +8,7 @@ script: npm test
 jobs:
     include:
         - stage: npm release
-          if: repo = jkhsjdhjs/node-fetch-cookies AND tag IS present AND type = push
+          if: fork = false AND tag =~ /^v\d+(\.\d+){2}$/
           script: skip
           deploy:
               provider: npm
@@ -16,4 +16,4 @@ jobs:
               on:
                   tags: true
               api_token:
-                  secure: 49x2b6FaWwTCfRXXl2CaQyADZ5cvWkxS/QHRjWOJaOyPVO0M/6H23EWGxu3xttUfKHv+RADrrWKiOnJhnOVD08wO/kpC3jizKQa7D3z08hLmt8lNf6I+gt3VjUnaM1JvEAtGruJcx0aUvbqEVEJ5EehPgE+4/IGCcYC0gF+xEU1ButyQprQspw333jAEBj+0EbwV3K8Tr8CdlpZHN2wh8uzSHGg1m6jMbVZcamI3uo1INoRzhGt5Fd4t5xPOfUYyFPMopCnXX8cwed5O3lgx8nFzhS7kSl8lJrCkhzrqmx/84s1mssEj6hvz6bH5zRwj9Om3wr/1N/Q76sP4Tf6kwbpMXZR/+1dUCgbdSV7XGqaUSDzsuOPUW9+cC/RBF0O0Cr/EfmvJx4Uy5pW/OcCAYBmmMxaupEkW583oGm3lTe66UW9x866j5HyG/z2ElsEDBJscpB2niB4pa71g+ypiJcWydruozOiejS+/Edy/cfM/JPmJv1BTpr8IntWKKsriVcrLXo1p+RMRAS1ZJzg+bU0wuBWTK4EbLE8663VBg4oTd9E1pwvpt5pnFKopeYtVLDX0Vtvd4+XQaUMf80Dx6mLrS1hWyLrt+fe1LX+1gNhwZFLDM0FZnnAaszzxVBAJlpD3F4hz7Jb6Q2ZRvNWP8DCNcJPtlcimSb8usk1eTDE=
+                  secure: "2The2UsnN3F55QDLfYTOP9/EGiARRdu7KnmGRNtAmM8j99sO11d2YyifwQomEH4yf2BI+NQ3gJgzPb+YNjc3jBUv3Z6z/mtL326aCH8lfD+9d5CFCh9MUJpg4egS8pAU0kMoRRhVCVdemhucMacN2y4vfZvudgxf4l3aZo07yq4pKewaVR4iLdEBtIg28UAL5ihAnPDPXBnksJlync8KpCH/GPHHYo/3mABiWvfbB1G9yyJeWdWSqLbyJWmP5i2jgYrzM/Rv1FlUizBisTzSv3bOJyFh0jbzgm/I0Of5Cco1J6yZqovbpoKcJEdXqQpY1wQlwuZ0tRJde/cAiauaJDxXiaEsSxGJysgA40iuL0emVo15cUkf3h3PsHs3vuxjvlNNI+KY7PI8pat8Jc5VubcTcRxRuAnU8pC4v4212e+sosEoqEUmoMk6IBXtNWZgGPugsE66SeJOZZFvVKezllz3v7ZuyqkhJ3Vh6yrSHpVFYnEra5uZRadbT/5nWblSnyDlZBYozRcgltnmic1zN7Ac5A9SaWonhfBf+/M9pjCP/VGwf33IrQueykACW1GjS3adVWlsl5jQr8rzuA3MyDV2WiEztA06jAD1xEpLVgLCa9fmYQI4PZY9XGytBpjJPWT8Mi9t/E4RLFVKJ1GBmPaZD6ejTpvYYLCJmBYCqI0="
