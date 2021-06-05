@@ -36,8 +36,9 @@ export default class Cookie {
         if (typeof requestURL !== "string")
             throw paramError("Second", "requestURL", "new Cookie()", "string");
 
-        // check if url is valid
-        new url.URL(requestURL);
+        // parse url
+        // if it is invalid an error will be raised
+        const parsedURL = new url.URL(requestURL);
 
         const splitted = str.split("; ");
         [this.name, this.value] = splitN(splitted[0], "=", 1);
@@ -47,8 +48,6 @@ export default class Cookie {
             );
         if (this.value.startsWith('"') && this.value.endsWith('"'))
             this.value = this.value.slice(1, -1);
-
-        const parsedURL = url.parse(requestURL);
 
         for (let i = 1; i < splitted.length; i++) {
             let [k, v] = splitN(splitted[i], "=", 1);
