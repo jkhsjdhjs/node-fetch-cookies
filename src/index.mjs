@@ -40,6 +40,11 @@ async function fetch(cookieJars, url, options) {
     }
     // shallow copy so we don't modify the original options object
     else options = {...options};
+    if (
+        options.follow !== undefined &&
+        (!Number.isSafeInteger(options.follow) || options.follow < 0)
+    )
+        throw new TypeError("options.follow is not a safe positive integer");
     if (cookies) {
         if (options.headers instanceof Headers) {
             // copy Headers as well so we don't modify it
@@ -67,6 +72,11 @@ async function fetch(cookieJars, url, options) {
             cookies.forEach(c => cookieJars.addCookie(c, url));
     }
     if (wantFollow && isRedirect(result.status)) {
+        if (options.follow !== undefined && --options.follow < 0)
+            throw new FetchError(
+                "maximum redirect reached at: " + url,
+                "max-redirect"
+            );
         const location = result.headers.get("location");
         options.redirect = "follow";
         return fetch(cookieJars, location, options);

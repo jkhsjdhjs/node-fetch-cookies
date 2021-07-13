@@ -1,7 +1,7 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 
-import {fetch, Cookie, CookieJar, Headers} from "../src/index.mjs";
+import {fetch, Cookie, CookieJar, FetchError, Headers} from "../src/index.mjs";
 
 export default Test => [
     new Test("fetch(): store cookies on redirects", () => {
@@ -31,6 +31,68 @@ export default Test => [
                 }
                 server.close();
                 resolve(true);
+            });
+        });
+    }),
+    new Test("fetch(): options.follow TypeError", async () => {
+        async function expectFollowTypeError(follow) {
+            try {
+                await fetch(null, "test", {
+                    follow: follow
+                });
+            } catch (error) {
+                if (
+                    error instanceof TypeError &&
+                    error.message ===
+                        "options.follow is not a safe positive integer"
+                )
+                    return true;
+            }
+            return false;
+        }
+
+        for (const follow of [
+            null,
+            -1,
+            "string",
+            Number.MAX_SAFE_INTEGER + 1
+        ]) {
+            if (!(await expectFollowTypeError(follow))) return false;
+        }
+
+        for (const follow of [undefined, 0, 10, Number.MAX_SAFE_INTEGER]) {
+            if (await expectFollowTypeError(follow)) return false;
+        }
+
+        return true;
+    }),
+    new Test("fetch(): redirect limit", () => {
+        const maxRedirects = 10;
+        const app = express();
+        let redirectCounter = 0;
+        app.get("/", (request, response) => {
+            if (redirectCounter++ <= maxRedirects) response.redirect("/");
+            response.send();
+        });
+        return new Promise(resolve => {
+            const server = app.listen(8081, async () => {
+                try {
+                    await fetch(null, "http://localhost:8081/", {
+                        follow: maxRedirects
+                    });
+                } catch (error) {
+                    if (
+                        error instanceof FetchError &&
+                        error.type === "max-redirect" &&
+                        error.message ===
+                            "maximum redirect reached at: http://localhost:8081/"
+                    )
+                        // we will fetch the final redirect, but not follow it. thus the redirectCounter is maxRedirects + 1
+                        resolve(redirectCounter === maxRedirects + 1);
+                } finally {
+                    server.close();
+                    resolve(false);
+                }
             });
         });
     }),
