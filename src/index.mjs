@@ -35,11 +35,17 @@ async function fetch(cookieJars, url, options) {
 
     const wantFollow =
         !options || !options.redirect || options.redirect === "follow";
-    if (!options && (cookies || wantFollow)) options = {};
+    if (!options) {
+        if (cookies || wantFollow) options = {};
+    }
+    // shallow copy so we don't modify the original options object
+    else options = {...options};
     if (cookies) {
-        if (options.headers instanceof Headers)
+        if (options.headers instanceof Headers) {
+            // copy Headers as well so we don't modify it
+            options.headers = new Headers(options.headers);
             options.headers.append("cookie", cookies.slice(0, -2));
-        else
+        } else
             options.headers = {
                 ...(options.headers || {}),
                 ...{cookie: cookies.slice(0, -2)}
