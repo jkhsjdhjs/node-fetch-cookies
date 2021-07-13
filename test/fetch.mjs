@@ -151,5 +151,23 @@ export default Test => [
                 resolve(true);
             });
         });
+    }),
+    new Test('fetch(): options.redirect: "manual"', () => {
+        const app = express();
+        let redirectCounter = 0;
+        app.get("/", (request, response) => {
+            if (redirectCounter++ > 0) response.status(400).send();
+            response.redirect("/");
+        });
+        return new Promise(resolve => {
+            const server = app.listen(8083, async () => {
+                const response = await fetch(null, "http://localhost:8083/", {
+                    redirect: "manual"
+                });
+                if (response.status !== 302) resolve(false);
+                server.close();
+                resolve(true);
+            });
+        });
     })
 ];
