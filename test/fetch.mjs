@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import {fetch, CookieJar} from "../src/index.mjs";
 
 export default Test => [
-    new Test("fetch()", () => {
+    new Test("fetch(): store cookies on redirects", () => {
         const cookieJar = new CookieJar();
         const app = express();
         app.use(cookieParser());
@@ -15,7 +15,7 @@ export default Test => [
             response.redirect("/foo");
         });
         app.get("/foo", (request, response) => {
-            if (request.cookies.foo !== "bar") response.status(400).send();
+            if (request.cookies.foo !== "bar") response.status(400);
             response.send();
         });
         return new Promise(resolve => {
@@ -23,7 +23,7 @@ export default Test => [
                 try {
                     const response = await fetch(
                         cookieJar,
-                        "http://localhost:8080"
+                        "http://localhost:8080/"
                     );
                     if (response.status !== 200) resolve(false);
                 } catch {
