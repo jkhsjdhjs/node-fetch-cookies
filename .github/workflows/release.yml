@@ -13,4 +13,9 @@ jobs:
             - uses: actions/checkout@v3
             - name: Setup Node.js
               uses: actions/setup-node@v3
+              with:
+                  registry-url: "https://registry.npmjs.org"
             - name: Publish node-fetch-cookies
+              run: npm publish
+              env:
+                  NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
