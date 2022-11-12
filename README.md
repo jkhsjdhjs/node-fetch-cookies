@@ -14,9 +14,6 @@ import {fetch, CookieJar} from "node-fetch-cookies";
     // creates a CookieJar instance
     const cookieJar = new CookieJar("jar.json");
 
-    // load cookies from the cookie jar
-    await cookieJar.load();
-
     // usual fetch usage, except with one or multiple cookie jars as first parameter
     const response = await fetch(cookieJar, "https://example.com");
 
@@ -24,6 +21,8 @@ import {fetch, CookieJar} from "node-fetch-cookies";
     await cookieJar.save();
 })();
 ```
+
+On the next start [`cookieJar.load()`](#async-loadfile--thisfile) can be used to load the cookies from the saved file.
 
 ### ...or without
 
