@@ -91,7 +91,7 @@ A class that stores cookies.
 #### new CookieJar([file, flags = `rw`, cookies, cookieIgnoreCallback])
 
 -   `file` An optional string containing a relative or absolute path to the file on the disk to use.
--   `flags` An optional string specifying whether cookies should be read and/or written from/to the jar when passing it as parameter to [fetch](#fetchcookiejar-url-options). Default: `rw`
+-   `flags` An optional string specifying whether cookies should be read and/or written from/to the jar when passing it as parameter to [fetch](#async-fetchcookiejars-url-options). Default: `rw`
     -   `r`: only read from this jar
     -   `w`: only write to this jar
     -   `rw` or `wr`: read/write from/to this jar
