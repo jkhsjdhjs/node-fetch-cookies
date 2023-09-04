@@ -202,5 +202,63 @@ export default Test => [
                 resolve(true);
             });
         });
+    }),
+    new Test("fetch(): HTTP 301/302/303 method change", () => {
+        const app = express();
+        let redirectCounter = 0;
+        app.all("/:statusCode(\\d+)", (request, response) => {
+            redirectCounter++;
+            response.redirect(+request.params.statusCode, "/get");
+        });
+        app.get("/get", (request, response) => {
+            response.set("X-foo", "bar");
+            response.send();
+        });
+        app.all("/get", (request, response) => {
+            response.send();
+        });
+        return new Promise(resolve => {
+            const server = app.listen(8084, async () => {
+                async function testRequestMethodChange(
+                    method,
+                    statusCode,
+                    shouldGET
+                ) {
+                    redirectCounter = 0;
+                    const response = await fetch(
+                        null,
+                        "http://localhost:8084/" + String(statusCode),
+                        {method: method}
+                    );
+                    if (
+                        response.status !== 200 ||
+                        redirectCounter !== 1 ||
+                        shouldGET !== (response.headers.get("X-foo") === "bar")
+                    )
+                        resolve(false);
+                }
+                for (const [method, shouldGET] of [
+                    ["GET", true],
+                    ["POST", true],
+                    ["PUT", false],
+                    ["DELETE", false],
+                    ["OPTIONS", false],
+                    ["HEAD", true]
+                ]) {
+                    // test whether 301/302 with POST changes method to GET...
+                    for (const statusCode of [301, 302]) {
+                        await testRequestMethodChange(
+                            method,
+                            statusCode,
+                            shouldGET
+                        );
+                    }
+                    // ...and the same for 303 with any method
+                    await testRequestMethodChange(method, 303, true);
+                }
+                server.close();
+                resolve(true);
+            });
+        });
     })
 ];

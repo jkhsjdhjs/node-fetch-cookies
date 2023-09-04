@@ -72,6 +72,17 @@ async function fetch(cookieJars, url, options) {
                 "maximum redirect reached at: " + url,
                 "max-redirect"
             );
+        // change method to "GET" and remove body & content-length if response is 303 or 301/302 with POST method
+        if (
+            result.status === 303 ||
+            ((result.status === 301 || result.status === 302) &&
+                typeof options.method === "string" &&
+                options.method.toUpperCase() === "POST")
+        ) {
+            options.method = "GET";
+            delete options.body;
+            if (options.headers) options.headers.delete("content-length");
+        }
         const location = result.headers.get("location");
         options.redirect = "follow";
         return fetch(cookieJars, location, options);
