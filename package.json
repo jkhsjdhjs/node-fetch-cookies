@@ -11,7 +11,7 @@
     ],
     "scripts": {
         "test": "node --experimental-modules test/index.mjs",
-        "lint": "npx eslint --ext mjs . && npx prettier --check package.json package-lock.json .github .prettierrc.json .eslintrc.json README.md"
+        "lint": "npx eslint --ext mjs src/ test/ && npx prettier --check package.json package-lock.json .github .prettierrc.json .eslintrc.json README.md"
     },
     "repository": {
         "type": "git",
