@@ -40,7 +40,7 @@ export default class Cookie {
         // if it is invalid an error will be raised
         const parsedURL = new url.URL(requestURL);
 
-        const splitted = str.split(/;\s*|;/);
+        const splitted = str.split(/;\s*/);
         [this.name, this.value] = splitN(splitted[0], "=", 1);
         if (!this.name)
             throw new CookieParseError(
