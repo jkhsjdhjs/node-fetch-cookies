@@ -46,15 +46,10 @@ async function fetch(cookieJars, url, options) {
     )
         throw new TypeError("options.follow is not a safe positive integer");
     if (cookies) {
-        if (options.headers instanceof Headers) {
-            // copy Headers as well so we don't modify it
-            options.headers = new Headers(options.headers);
-            options.headers.append("cookie", cookies.slice(0, -2));
-        } else
-            options.headers = {
-                ...(options.headers || {}),
-                ...{cookie: cookies.slice(0, -2)}
-            };
+        // copy Headers as well so we don't modify it
+        // or, if headers is an object, construct a Headers object from it
+        options.headers = new Headers(options.headers);
+        options.headers.append("cookie", cookies.slice(0, -2));
     }
     if (wantFollow) options.redirect = "manual";
     const result = await nodeFetch(url, options);

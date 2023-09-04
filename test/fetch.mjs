@@ -169,5 +169,38 @@ export default Test => [
                 resolve(true);
             });
         });
+    }),
+    new Test("fetch(): options.headers are sent correctly", () => {
+        const app = express();
+        app.get("/", (request, response) => {
+            for (const [key, value] of Object.entries(request.headers)) {
+                if (key.startsWith("x-")) response.set(key, value);
+            }
+            response.send();
+        });
+        // test whether options.headers are correctly sent as object (dict) and also as Headers() object
+        return new Promise(resolve => {
+            const server = app.listen(8085, async () => {
+                const HEADER_ASSERT = {
+                    "X-abc": "def",
+                    "X-foo": "bar"
+                };
+                for (const headers of [
+                    HEADER_ASSERT,
+                    new Headers(HEADER_ASSERT)
+                ]) {
+                    const response = await fetch(
+                        null,
+                        "http://localhost:8085/",
+                        {headers: headers}
+                    );
+                    for (const [key, value] of Object.entries(HEADER_ASSERT)) {
+                        if (response.headers.get(key) !== value) resolve(false);
+                    }
+                }
+                server.close();
+                resolve(true);
+            });
+        });
     })
 ];
