@@ -179,6 +179,11 @@ export default Test => [
                 // success max-age takes precendence over expires
                 'id="a3fWa"; Max-Age=1000; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
                 "https://github.com"
+            ],
+            [
+                // success split multiple or no spaces (e5f03df)
+                "id=a3fWa;          Max-Age=1000;Expires=Thu, 01 Jan 1970 00:00:00 GMT",
+                "https://example.com"
             ]
         ];
 
@@ -406,6 +411,20 @@ export default Test => [
                     value: "a3fWa",
                     secure: false,
                     domain: "github.com",
+                    subdomains: false,
+                    path: "/"
+                }
+            ) &&
+            compareCookieProps(
+                inputs[35],
+                exp =>
+                    exp.getTime() >
+                    new Date("Thu, 01 Jan 1970 00:00:00 GMT").getTime(),
+                {
+                    name: "id",
+                    value: "a3fWa",
+                    secure: false,
+                    domain: "example.com",
                     subdomains: false,
                     path: "/"
                 }
