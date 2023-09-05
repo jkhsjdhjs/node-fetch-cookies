@@ -62,6 +62,7 @@ This module exports the following classes/functions:
 -   [`Request`](https://github.com/node-fetch/node-fetch#class-request)
 -   [`Response`](https://github.com/node-fetch/node-fetch#class-response)
 -   [`FetchError`](https://github.com/node-fetch/node-fetch#class-fetcherror)
+-   [`AbortError`](https://github.com/node-fetch/node-fetch#class-aborterror)
 -   `isRedirect`: A function that accepts a number, more precisely an http status code as input, and returns, whether the status code is a redirect status code as a boolean.  
     It is implemented in `node-fetch` and used by `node-fetch-cookies`. It is also exported here, because `node-fetch` exports it.
 
