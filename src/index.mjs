@@ -1,4 +1,10 @@
-import nodeFetch, {Headers, Request, Response, FetchError} from "node-fetch";
+import nodeFetch, {
+    Headers,
+    Request,
+    Response,
+    FetchError,
+    AbortError
+} from "node-fetch";
 import CookieJar from "./cookie-jar.mjs";
 import Cookie from "./cookie.mjs";
 import {paramError, CookieParseError} from "./errors.mjs";
@@ -102,5 +108,6 @@ export {
     Request,
     Response,
     FetchError,
+    AbortError,
     isRedirect
 };

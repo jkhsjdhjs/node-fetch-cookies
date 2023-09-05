@@ -30,7 +30,7 @@
     },
     "homepage": "https://github.com/jkhsjdhjs/node-fetch-cookies#readme",
     "dependencies": {
-        "node-fetch": "^2.6.7"
+        "node-fetch": "^2.7.0"
     },
     "devDependencies": {
         "cookie-parser": "^1.4.5",
