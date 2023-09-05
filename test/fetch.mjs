@@ -77,15 +77,21 @@ export default Test => [
         return new Promise(resolve => {
             const server = app.listen(0, async () => {
                 try {
-                    await fetch(null, `http://localhost:${server.address().port}/`, {
-                        follow: maxRedirects
-                    });
+                    await fetch(
+                        null,
+                        `http://localhost:${server.address().port}/`,
+                        {
+                            follow: maxRedirects
+                        }
+                    );
                 } catch (error) {
                     if (
                         error instanceof FetchError &&
                         error.type === "max-redirect" &&
                         error.message ===
-                            `maximum redirect reached at: http://localhost:${server.address().port}/`
+                            `maximum redirect reached at: http://localhost:${
+                                server.address().port
+                            }/`
                     )
                         // we will fetch the final redirect, but not follow it. thus the redirectCounter is maxRedirects + 1
                         resolve(redirectCounter === maxRedirects + 1);
@@ -161,9 +167,13 @@ export default Test => [
         });
         return new Promise(resolve => {
             const server = app.listen(0, async () => {
-                const response = await fetch(null, `http://localhost:${server.address().port}/`, {
-                    redirect: "manual"
-                });
+                const response = await fetch(
+                    null,
+                    `http://localhost:${server.address().port}/`,
+                    {
+                        redirect: "manual"
+                    }
+                );
                 if (response.status !== 302) resolve(false);
                 server.close();
                 resolve(true);
@@ -227,7 +237,8 @@ export default Test => [
                     redirectCounter = 0;
                     const response = await fetch(
                         null,
-                        `http://localhost:${server.address().port}/` + String(statusCode),
+                        `http://localhost:${server.address().port}/` +
+                            String(statusCode),
                         {method: method}
                     );
                     if (
