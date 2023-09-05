@@ -19,11 +19,11 @@ export default Test => [
             response.send();
         });
         return new Promise(resolve => {
-            const server = app.listen(8080, async () => {
+            const server = app.listen(0, async () => {
                 try {
                     const response = await fetch(
                         cookieJar,
-                        "http://localhost:8080/"
+                        `http://localhost:${server.address().port}/`
                     );
                     if (response.status !== 200) resolve(false);
                 } catch {
@@ -75,9 +75,9 @@ export default Test => [
             response.send();
         });
         return new Promise(resolve => {
-            const server = app.listen(8081, async () => {
+            const server = app.listen(0, async () => {
                 try {
-                    await fetch(null, "http://localhost:8081/", {
+                    await fetch(null, `http://localhost:${server.address().port}/`, {
                         follow: maxRedirects
                     });
                 } catch (error) {
@@ -85,7 +85,7 @@ export default Test => [
                         error instanceof FetchError &&
                         error.type === "max-redirect" &&
                         error.message ===
-                            "maximum redirect reached at: http://localhost:8081/"
+                            `maximum redirect reached at: http://localhost:${server.address().port}/`
                     )
                         // we will fetch the final redirect, but not follow it. thus the redirectCounter is maxRedirects + 1
                         resolve(redirectCounter === maxRedirects + 1);
@@ -107,7 +107,7 @@ export default Test => [
             response.send();
         });
         return new Promise(resolve => {
-            const server = app.listen(8082, async () => {
+            const server = app.listen(0, async () => {
                 async function checkOptionsModification(options) {
                     const cookieJar = new CookieJar();
                     cookieJar.addCookie(
@@ -124,7 +124,7 @@ export default Test => [
                     const optionsStr = JSON.stringify(options);
                     const response = await fetch(
                         cookieJar,
-                        "http://localhost:8082/",
+                        `http://localhost:${server.address().port}/`,
                         options
                     );
                     if (response.status !== 200) return false;
@@ -160,8 +160,8 @@ export default Test => [
             response.redirect("/");
         });
         return new Promise(resolve => {
-            const server = app.listen(8083, async () => {
-                const response = await fetch(null, "http://localhost:8083/", {
+            const server = app.listen(0, async () => {
+                const response = await fetch(null, `http://localhost:${server.address().port}/`, {
                     redirect: "manual"
                 });
                 if (response.status !== 302) resolve(false);
@@ -180,7 +180,7 @@ export default Test => [
         });
         // test whether options.headers are correctly sent as object (dict) and also as Headers() object
         return new Promise(resolve => {
-            const server = app.listen(8085, async () => {
+            const server = app.listen(0, async () => {
                 const HEADER_ASSERT = {
                     "X-abc": "def",
                     "X-foo": "bar"
@@ -191,7 +191,7 @@ export default Test => [
                 ]) {
                     const response = await fetch(
                         null,
-                        "http://localhost:8085/",
+                        `http://localhost:${server.address().port}/`,
                         {headers: headers}
                     );
                     for (const [key, value] of Object.entries(HEADER_ASSERT)) {
@@ -218,7 +218,7 @@ export default Test => [
             response.send();
         });
         return new Promise(resolve => {
-            const server = app.listen(8084, async () => {
+            const server = app.listen(0, async () => {
                 async function testRequestMethodChange(
                     method,
                     statusCode,
@@ -227,7 +227,7 @@ export default Test => [
                     redirectCounter = 0;
                     const response = await fetch(
                         null,
-                        "http://localhost:8084/" + String(statusCode),
+                        `http://localhost:${server.address().port}/` + String(statusCode),
                         {method: method}
                     );
                     if (
