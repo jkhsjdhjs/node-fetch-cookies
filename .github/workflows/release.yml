@@ -15,7 +15,11 @@ jobs:
               uses: actions/setup-node@v3
               with:
                   registry-url: "https://registry.npmjs.org"
-            - name: Publish node-fetch-cookies
+            - name: Publish GitHub release
+              uses: eloquent/github-release-action@v3
+              with:
+                  prerelease: "false"
+            - name: Publish npm release
               run: npm publish
               env:
                   NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
