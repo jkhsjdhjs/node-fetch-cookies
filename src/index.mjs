@@ -51,10 +51,10 @@ async function fetch(cookieJars, url, options) {
         (!Number.isSafeInteger(options.follow) || options.follow < 0)
     )
         throw new TypeError("options.follow is not a safe positive integer");
+    // copy Headers as well so we don't modify it
+    // or, if headers is an object, construct a Headers object from it
+    options.headers = new Headers(options.headers);
     if (cookies) {
-        // copy Headers as well so we don't modify it
-        // or, if headers is an object, construct a Headers object from it
-        options.headers = new Headers(options.headers);
         options.headers.append("cookie", cookies.slice(0, -2));
     }
     if (wantFollow) options.redirect = "manual";
@@ -87,7 +87,9 @@ async function fetch(cookieJars, url, options) {
         ) {
             options.method = "GET";
             delete options.body;
-            if (options.headers) options.headers.delete("content-length");
+            if (options.headers) {
+                options.headers.delete("content-length");
+            }
         }
         const location = result.headers.get("location");
         options.redirect = "follow";
