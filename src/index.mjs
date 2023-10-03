@@ -55,6 +55,10 @@ async function fetch(cookieJars, url, options) {
     // or, if headers is an object, construct a Headers object from it
     options.headers = new Headers(options.headers);
     if (cookies) {
+        if (options.headers.has("cookie"))
+            throw new Error(
+                "options.headers already contains a cookie header!"
+            );
         options.headers.append("cookie", cookies.slice(0, -2));
     }
     if (wantFollow) options.redirect = "manual";
@@ -93,6 +97,8 @@ async function fetch(cookieJars, url, options) {
         }
         const location = result.headers.get("location");
         options.redirect = "follow";
+        // delete cookie header from previous request to avoid a duplicate cookie header
+        options.headers.delete("cookie");
         return fetch(cookieJars, location, options);
     }
     return result;
