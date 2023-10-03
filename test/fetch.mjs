@@ -292,13 +292,16 @@ export default Test => [
         return new Promise(resolve => {
             const server = app.listen(0, async () => {
                 const cookieJar = new CookieJar();
-                const response = await fetch(cookieJar, `http://localhost:${server.address().port}/`, {
-                    method: "PUT"
-                });
+                const response = await fetch(
+                    cookieJar,
+                    `http://localhost:${server.address().port}/`,
+                    {
+                        method: "PUT"
+                    }
+                );
                 server.close();
                 resolve(response.ok);
             });
-
         });
     })
 ];
