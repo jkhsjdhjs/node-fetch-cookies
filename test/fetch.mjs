@@ -271,5 +271,34 @@ export default Test => [
                 resolve(true);
             });
         });
+    }),
+    new Test("fetch(): no duplicate header on redirect", () => {
+        const app = express();
+        app.use(cookieParser());
+        app.put("/", (request, response) => {
+            response.cookie("foo", "bar");
+            response.redirect(302, "/redirect");
+        });
+        app.put("/redirect", (request, response) => {
+            response.cookie("foo2", "bar");
+            response.redirect(303, "/redirect2");
+        });
+        app.get("/redirect2", (request, response) => {
+            if (request.headers["cookie"].split("foo=bar").length > 2) {
+                response.status(400);
+            }
+            response.send();
+        });
+        return new Promise(resolve => {
+            const server = app.listen(0, async () => {
+                const cookieJar = new CookieJar();
+                const response = await fetch(cookieJar, `http://localhost:${server.address().port}/`, {
+                    method: "PUT"
+                });
+                server.close();
+                resolve(response.ok);
+            });
+
+        });
     })
 ];
