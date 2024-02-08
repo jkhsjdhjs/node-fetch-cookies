@@ -67,7 +67,7 @@ export default class CookieJar {
     }
     *cookiesValid(withSession) {
         for (const cookie of this.cookiesAll())
-            if (!cookie.hasExpired(!withSession)) yield cookie;
+            if (!cookie.hasExpired(!withSession) || cookie.expiry === null) yield cookie;
     }
     *cookiesAll() {
         for (const domain of this.domains()) yield* this.cookiesDomain(domain);
